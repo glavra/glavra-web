@@ -4,14 +4,21 @@ window.addEventListener('load', function() {
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
     sock.addEventListener('open', function() {
-        // TODO negotiate username blah blah
+        sock.send(JSON.stringify({
+            type: 'auth',
+            username: Math.random().toString().slice(2),
+            password: 'notarealpassword'
+        }));
     });
     sock.addEventListener('message', function(e) {
         var data = JSON.parse(e.data);
         console.log(data);
         switch (data.type) {
+            case 'authResponse':
+                console.log('auth success: ' + data.success);
+                break;
             case 'message':
-                output.innerText += data.text + '\n';
+                output.innerText += '<' + data.username + '> ' + data.text + '\n';
                 break;
         }
     });
