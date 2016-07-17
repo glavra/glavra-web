@@ -18,7 +18,9 @@ window.addEventListener('load', function() {
                 console.log('auth success: ' + data.success);
                 break;
             case 'message':
-                output.innerText += '<' + data.username + '> ' + data.text + '\n';
+                output.innerText +=
+                    new Date(data.timestamp * 1000).toLocaleTimeString() +
+                    ' <' + data.username + '> ' + data.text + '\n';
                 break;
         }
     });
