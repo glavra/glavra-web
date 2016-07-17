@@ -19,7 +19,7 @@ window.addEventListener('load', function() {
                 break;
             case 'message':
                 output.innerText +=
-                    new Date(data.timestamp * 1000).toLocaleTimeString() +
+                    new Date(data.timestamp).toLocaleTimeString() +
                     ' <' + data.username + '> ' + data.text + '\n';
                 break;
         }
