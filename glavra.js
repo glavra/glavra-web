@@ -97,16 +97,26 @@ function showLoginPrompt(sock) {
         container.appendChild(input);
     });
 
-    var submit = document.createElement('input');
-    submit.type = 'submit';
-    submit.value = 'Login';
-    loginForm.appendChild(submit);
+    var submitAction = 'auth';
+
+    var submitLogin = document.createElement('input');
+    submitLogin.type = 'submit';
+    submitLogin.value = 'Login';
+    loginForm.appendChild(submitLogin);
+
+    var submitRegister = document.createElement('input');
+    submitRegister.type = 'submit';
+    submitRegister.value = 'Register';
+    submitRegister.addEventListener('click', function() {
+        submitAction = 'register';
+    });
+    loginForm.appendChild(submitRegister);
 
     var closeDialog;
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         sock.send(JSON.stringify({
-            type: 'auth',
+            type: submitAction,
             username: document.getElementById('usernameInput').value,
             password: document.getElementById('passwordInput').value
         }));
