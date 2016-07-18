@@ -74,11 +74,26 @@ window.addEventListener('load', function() {
                     editLink.href = 'javascript:;';
                     editLink.addEventListener('click', function(e) {
                         e.preventDefault();
-                        messageEditing = +newMessage.dataset.id;
+                        messageEditing = data.id;
                         message.value = newMessage.dataset.markdown;
                         message.focus();
                     });
                     menu.appendChild(editLink);
+
+                    ['upvote', 'downvote', 'star', 'pin'].forEach(function(vote, idx) {
+                        var voteLink = document.createElement('a');
+                        voteLink.textContent = vote;
+                        voteLink.href = 'javascript:;';
+                        voteLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            sock.send(JSON.stringify({
+                                type: 'vote',
+                                messageid: data.id,
+                                votetype: idx + 1
+                            }));
+                        });
+                        menu.appendChild(voteLink);
+                    });
 
                     menu.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -114,6 +129,45 @@ window.addEventListener('load', function() {
                 if (editedMessage) {
                     editedMessage.dataset.markdown = data.text;
                     editedMessage.innerHTML = markdown(data.text);
+                }
+                break;
+
+            case 'vote':
+                var votedMessage = document.querySelector('[data-id="' +
+                        data.messageid + '"]');
+                if (votedMessage) {
+                    var votebox = document.querySelector(
+                        '.votebox[data-messageid="' + data.messageid + '"]');
+                    if (!votebox) {
+                        votebox = document.createElement('div');
+                        votebox.dataset.messageid = data.messageid;
+                        votebox.className = 'votebox';
+                        votedMessage.parentNode.insertBefore(votebox,
+                                votedMessage);
+                    }
+                    var icon = document.createElement('span');
+                    icon.className = [
+                        'fa fa-thumbs-up',
+                        'fa fa-thumbs-down',
+                        'fa fa-star',
+                        'fa fa-thumb-tack'
+                    ][data.votetype - 1];
+                    icon.dataset.votetype = data.votetype;
+                    votebox.appendChild(icon);
+                }
+                break;
+
+            case 'undovote':
+                var votedMessage = document.querySelector('[data-id="' +
+                        data.messageid + '"]');
+                if (votedMessage) {
+                    var votebox = document.querySelector(
+                        '.votebox[data-messageid="' + data.messageid + '"]');
+                    if (votebox) {
+                        var voteicon = votebox.querySelector(
+                                '[data-votetype="' + data.votetype + '"]');
+                        votebox.removeChild(voteicon);
+                    }
                 }
                 break;
         }

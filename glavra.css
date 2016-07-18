@@ -54,6 +54,7 @@ html {
 
 .messageList {
     flex: 1;
+    position: relative;
     background-color: #dddddd;
     border: 1px dotted #bbbbbb;
     margin: 0px 3px;
@@ -63,6 +64,11 @@ html {
 
 .messageList > div {
     position: relative;
+}
+
+.messageList > div.votebox {
+    position: absolute;
+    right: 5px;
 }
 
 .messageList > div > p {
@@ -106,4 +112,8 @@ html {
     width: 100%;
     height: 100%;
     background-color: #cccccc;
+}
+
+.messageMenu > a {
+    margin: 0px 3px;
 }
