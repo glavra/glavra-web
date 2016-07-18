@@ -10,8 +10,40 @@ window.addEventListener('load', function() {
 
     var loggedIn = false, messageEditing;
 
-    var output = document.getElementById('output');
-    var messages = document.getElementById('messages');
+    var messagesList = document.getElementById('messages');
+    var inputForm = document.getElementById('inputForm');
+    var messageInput = document.getElementById('message');
+
+    var sendMessage = function() {
+        if (loggedIn) {
+            if (messageEditing) {
+                sock.send(JSON.stringify({
+                    type: 'edit',
+                    id: messageEditing,
+                    text: messageInput.value
+                }));
+                messageInput.value = '';
+                messageEditing = null;
+            } else {
+                sock.send(JSON.stringify({
+                    type: 'message',
+                    text: messageInput.value
+                }));
+                messageInput.value = '';
+            }
+        } else showLoginPrompt(sock);
+    };
+
+    inputForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        sendMessage();
+    });
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
 
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer({safe: true});
@@ -75,8 +107,8 @@ window.addEventListener('load', function() {
                     editLink.addEventListener('click', function(e) {
                         e.preventDefault();
                         messageEditing = data.id;
-                        message.value = newMessage.dataset.markdown;
-                        message.focus();
+                        messageInput.value = newMessage.dataset.markdown;
+                        messageInput.focus();
                     });
                     menu.appendChild(editLink);
 
@@ -101,14 +133,14 @@ window.addEventListener('load', function() {
                     });
                 });
 
-                if (messages.lastChild &&
-                        messages.lastChild.dataset.userid == data.userid) {
-                    messages.lastChild.lastChild.appendChild(newMessage);
+                if (messagesList.lastChild &&
+                        messagesList.lastChild.dataset.userid == data.userid) {
+                    messagesList.lastChild.lastChild.appendChild(newMessage);
                 } else {
                     var monologue = document.createElement('div');
                     monologue.dataset.userid = data.userid;
                     monologue.className = 'monologue';
-                    messages.appendChild(monologue);
+                    messagesList.appendChild(monologue);
 
                     var usercard = document.createElement('div');
                     usercard.className = 'usercard';
@@ -120,7 +152,7 @@ window.addEventListener('load', function() {
                     monologue.appendChild(messageList);
                     messageList.appendChild(newMessage);
                 }
-                messages.scrollTo(0, messages.scrollHeight);
+                messagesList.scrollTo(0, messagesList.scrollHeight);
                 break;
 
             case 'edit':
@@ -170,38 +202,6 @@ window.addEventListener('load', function() {
                     }
                 }
                 break;
-        }
-    });
-
-    var inputForm = document.getElementById('inputForm'),
-        message = document.getElementById('message'),
-        sendMessage = function() {
-            if (loggedIn) {
-                if (messageEditing) {
-                    sock.send(JSON.stringify({
-                        type: 'edit',
-                        id: messageEditing,
-                        text: message.value
-                    }));
-                    message.value = '';
-                    messageEditing = null;
-                } else {
-                    sock.send(JSON.stringify({
-                        type: 'message',
-                        text: message.value
-                    }));
-                    message.value = '';
-                }
-            } else showLoginPrompt(sock);
-        };
-    inputForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        sendMessage();
-    });
-    message.addEventListener('keypress', function(e) {
-        if (e.which == 13) {
-            e.preventDefault();
-            sendMessage();
         }
     });
 
