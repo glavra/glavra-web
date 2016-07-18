@@ -2,8 +2,8 @@
 var strings = {
     authSuccess: 'You have successfully been authenticated.',
     authFailure: 'Your username or password was incorrect.',
-    authSuccess: 'Your account has been created.',
-    authFailure: 'Someone already has that username.'
+    registerSuccess: 'Your account has been created.',
+    registerFailure: 'Someone already has that username.'
 };
 
 window.addEventListener('load', function() {
