@@ -42,9 +42,25 @@ window.addEventListener('load', function() {
                 }
                 break;
             case 'message':
-                output.innerText +=
-                    new Date(data.timestamp * 1000).toLocaleTimeString() +
-                    ' <' + data.username + '> ' + data.text + '\n';
+                var newMessage = document.createElement('div');
+                newMessage.innerText = data.text;
+                if (messages.lastChild &&
+                        messages.lastChild.dataset.userid == data.userid) {
+                    messages.lastChild.lastChild.appendChild(newMessage);
+                } else {
+                    var monologue = document.createElement('div');
+                    monologue.dataset.userid = data.userid;
+                    monologue.className = 'monologue';
+                    var usercard = document.createElement('div');
+                    usercard.className = 'usercard';
+                    usercard.innerText = data.username;
+                    monologue.appendChild(usercard);
+                    var messageList = document.createElement('div');
+                    messageList.className = 'messageList';
+                    monologue.appendChild(messageList);
+                    messages.appendChild(monologue);
+                    messageList.appendChild(newMessage);
+                }
                 messages.scrollTo(0, messages.scrollHeight);
                 break;
         }
