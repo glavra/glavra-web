@@ -11,6 +11,7 @@ window.addEventListener('load', function() {
     var loggedIn = false;
 
     var output = document.getElementById('output');
+    var messages = document.getElementById('messages');
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
     sock.addEventListener('open', function() {
@@ -44,21 +45,31 @@ window.addEventListener('load', function() {
                 output.innerText +=
                     new Date(data.timestamp * 1000).toLocaleTimeString() +
                     ' <' + data.username + '> ' + data.text + '\n';
+                messages.scrollTo(0, messages.scrollHeight);
                 break;
         }
     });
 
     var inputForm = document.getElementById('inputForm'),
-        message = document.getElementById('message');
+        message = document.getElementById('message'),
+        sendMessage = function() {
+            if (loggedIn) {
+                sock.send(JSON.stringify({
+                    type: 'message',
+                    text: message.value
+                }));
+                message.value = '';
+            } else showLoginPrompt(sock);
+        };
     inputForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (loggedIn) {
-            sock.send(JSON.stringify({
-                type: 'message',
-                text: message.value
-            }));
-            message.value = '';
-        } else showLoginPrompt(sock);
+        sendMessage();
+    });
+    message.addEventListener('keypress', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            sendMessage();
+        }
     });
 
     window.addEventListener('beforeunload', function() {
