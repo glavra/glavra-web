@@ -8,13 +8,19 @@ var strings = {
 
 window.addEventListener('load', function() {
 
-    var loggedIn = false;
+    var loggedIn = false, messageEditing;
 
     var output = document.getElementById('output');
     var messages = document.getElementById('messages');
 
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer({safe: true});
+    var markdown = function(text) {
+        var escaped = text.replace(/[<&]/g, function(m) {
+            return ({'<': '&lt;', '&': '&amp;'})[m];
+        });
+        return writer.render(reader.parse(escaped));
+    };
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
     sock.addEventListener('open', function() {
@@ -24,6 +30,7 @@ window.addEventListener('load', function() {
         var data = JSON.parse(e.data);
         console.log(data);
         switch (data.type) {
+
             case 'auth':
                 if (data.success) {
                     loggedIn = true;
@@ -34,6 +41,7 @@ window.addEventListener('load', function() {
                     showDialog(text);
                 }
                 break;
+
             case 'register':
                 if (data.success) {
                     loggedIn = true;
@@ -44,12 +52,40 @@ window.addEventListener('load', function() {
                     showDialog(text);
                 }
                 break;
+
             case 'message':
                 var newMessage = document.createElement('div');
-                var escaped = data.text.replace(/[<&]/g, function(m) {
-                    return ({'<': '&lt;', '&': '&amp;'})[m];
+                newMessage.dataset.id = data.id;
+                newMessage.dataset.markdown = data.text;
+                newMessage.innerHTML = markdown(data.text);
+
+                newMessage.addEventListener('click', function() {
+                    var oldMenu = document.getElementsByClassName('messageMenu');
+                    if (oldMenu[0]) {
+                        oldMenu[0].parentNode.removeChild(oldMenu[0]);
+                    }
+
+                    var menu = document.createElement('div');
+                    menu.className = 'messageMenu';
+                    this.appendChild(menu);
+
+                    var editLink = document.createElement('a');
+                    editLink.textContent = 'edit';
+                    editLink.href = 'javascript:;';
+                    editLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        messageEditing = +newMessage.dataset.id;
+                        message.value = newMessage.dataset.markdown;
+                        message.focus();
+                    });
+                    menu.appendChild(editLink);
+
+                    menu.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        newMessage.removeChild(menu);
+                    });
                 });
-                newMessage.innerHTML = writer.render(reader.parse(escaped));
+
                 if (messages.lastChild &&
                         messages.lastChild.dataset.userid == data.userid) {
                     messages.lastChild.lastChild.appendChild(newMessage);
@@ -71,6 +107,15 @@ window.addEventListener('load', function() {
                 }
                 messages.scrollTo(0, messages.scrollHeight);
                 break;
+
+            case 'edit':
+                var editedMessage = document.querySelector('[data-id="' +
+                        data.id + '"]');
+                if (editedMessage) {
+                    editedMessage.dataset.markdown = data.text;
+                    editedMessage.innerHTML = markdown(data.text);
+                }
+                break;
         }
     });
 
@@ -78,11 +123,21 @@ window.addEventListener('load', function() {
         message = document.getElementById('message'),
         sendMessage = function() {
             if (loggedIn) {
-                sock.send(JSON.stringify({
-                    type: 'message',
-                    text: message.value
-                }));
-                message.value = '';
+                if (messageEditing) {
+                    sock.send(JSON.stringify({
+                        type: 'edit',
+                        id: messageEditing,
+                        text: message.value
+                    }));
+                    message.value = '';
+                    messageEditing = null;
+                } else {
+                    sock.send(JSON.stringify({
+                        type: 'message',
+                        text: message.value
+                    }));
+                    message.value = '';
+                }
             } else showLoginPrompt(sock);
         };
     inputForm.addEventListener('submit', function(e) {
