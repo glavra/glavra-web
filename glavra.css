@@ -61,6 +61,10 @@ html {
     border-radius: 3px;
 }
 
+.messageList > div > p {
+    margin: 2px;
+}
+
 .dialog {
     position: fixed;
     top: 50%;

@@ -13,6 +13,9 @@ window.addEventListener('load', function() {
     var output = document.getElementById('output');
     var messages = document.getElementById('messages');
 
+    var reader = new commonmark.Parser();
+    var writer = new commonmark.HtmlRenderer({safe: true});
+
     var sock = new WebSocket('ws://127.0.0.1:3012');
     sock.addEventListener('open', function() {
         showLoginPrompt(sock);
@@ -43,7 +46,10 @@ window.addEventListener('load', function() {
                 break;
             case 'message':
                 var newMessage = document.createElement('div');
-                newMessage.innerText = data.text;
+                var escaped = data.text.replace(/[<&]/g, function(m) {
+                    return ({'<': '&lt;', '&': '&amp;'})[m];
+                });
+                newMessage.innerHTML = writer.render(reader.parse(escaped));
                 if (messages.lastChild &&
                         messages.lastChild.dataset.userid == data.userid) {
                     messages.lastChild.lastChild.appendChild(newMessage);
@@ -51,14 +57,16 @@ window.addEventListener('load', function() {
                     var monologue = document.createElement('div');
                     monologue.dataset.userid = data.userid;
                     monologue.className = 'monologue';
+                    messages.appendChild(monologue);
+
                     var usercard = document.createElement('div');
                     usercard.className = 'usercard';
                     usercard.innerText = data.username;
                     monologue.appendChild(usercard);
+
                     var messageList = document.createElement('div');
                     messageList.className = 'messageList';
                     monologue.appendChild(messageList);
-                    messages.appendChild(monologue);
                     messageList.appendChild(newMessage);
                 }
                 messages.scrollTo(0, messages.scrollHeight);
