@@ -1,7 +1,9 @@
 // TODO make this not terrible
 var strings = {
     authSuccess: 'You have successfully been authenticated.',
-    authFailure: 'Your username or password was incorrect.'
+    authFailure: 'Your username or password was incorrect.',
+    authSuccess: 'Your account has been created.',
+    authFailure: 'Someone already has that username.'
 };
 
 window.addEventListener('load', function() {
@@ -18,13 +20,23 @@ window.addEventListener('load', function() {
         var data = JSON.parse(e.data);
         console.log(data);
         switch (data.type) {
-            case 'authResponse':
+            case 'auth':
                 if (data.success) {
                     loggedIn = true;
                     var text = document.createTextNode(strings.authSuccess);
                     showDialog(text);
                 } else {
                     var text = document.createTextNode(strings.authFailure);
+                    showDialog(text);
+                }
+                break;
+            case 'register':
+                if (data.success) {
+                    loggedIn = true;
+                    var text = document.createTextNode(strings.registerSuccess);
+                    showDialog(text);
+                } else {
+                    var text = document.createTextNode(strings.registerFailure);
                     showDialog(text);
                 }
                 break;
