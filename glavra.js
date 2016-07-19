@@ -105,7 +105,7 @@ window.addEventListener('load', function() {
 
                     var timestamp = document.createElement('a');
                     timestamp.textContent =
-                        reltime(new Date(data.timestamp * 1000), false);
+                        fmttime(new Date(data.timestamp * 1000), false);
                     menu.appendChild(timestamp);
 
                     var editLink = document.createElement('a');
@@ -259,7 +259,8 @@ window.addEventListener('load', function() {
                     starredInfo.textContent = '—' +
                         (messageData.username ?
                             (messageData.username + ', ') : '') +
-                        reltime(new Date(messageData.timestamp * 1000), true);
+                        fmttime(new Date(messageData.timestamp * 1000), true) +
+                        ' ago';
                     messageWrapper.appendChild(starredInfo);
                 });
                 break;
@@ -344,13 +345,21 @@ function showLoginPrompt(sock) {
     document.getElementById('usernameInput').focus();
 }
 
-function reltime(date, longFormat) {
-    // TODO make this /actually/ be relative time
-    if (longFormat) {
-        return date.toDateString().split(' ').slice(1).join(' ') + ' ' +
-            date.toTimeString().split(' ')[0];
+function fmttime(date, relative) {
+    var days = Math.floor(now / (1000 * 60 * 60 * 24)) -
+        Math.floor(date / (1000 * 60 * 60 * 24));
+    if (relative) {
+        var now = new Date();
+        var seconds = (now.getTime() - date.getTime()) / 1000;
+        if (seconds < 60) return Math.floor(seconds) + 's';
+        var minutes = seconds / 60;
+        if (minutes < 60) return Math.floor(minutes) + 'm';
+        var hours = minutes / 60;
+        if (hours < 24) return Math.floor(hours) + 'h';
+        if (days < 32) return days + 'd';
+        return fmttime(date, false);
     } else {
-        return date.toDateString().split(' ').slice(1).join(' ') + ' ' +
-            date.toTimeString().split(' ')[0];
+        return date.toLocaleTimeString() + (days ?
+                ' ' + date.toLocaleDateString() : '');
     }
 }
