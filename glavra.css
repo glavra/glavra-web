@@ -62,6 +62,10 @@ html {
     border-radius: 3px;
 }
 
+#starred > .messageList {
+    margin: 3px 0px;
+}
+
 .messageList > div {
     position: relative;
 }
@@ -69,6 +73,7 @@ html {
 .messageList > div.votebox {
     position: absolute;
     right: 5px;
+    color: #888888;
 }
 
 .messageList > div > p {
@@ -116,4 +121,10 @@ html {
 
 .messageMenu > a {
     margin: 0px 3px;
+}
+
+.starInfo {
+    font-size: 10pt;
+    color: #888888;
+    padding: 0px 3px;
 }

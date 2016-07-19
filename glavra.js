@@ -11,6 +11,7 @@ window.addEventListener('load', function() {
     var loggedIn = false, messageEditing;
 
     var messagesList = document.getElementById('messages');
+    var starredList = document.getElementById('starred');
     var inputForm = document.getElementById('inputForm');
     var messageInput = document.getElementById('message');
 
@@ -156,11 +157,11 @@ window.addEventListener('load', function() {
                 break;
 
             case 'edit':
-                var editedMessage = document.querySelector('[data-id="' +
+                var editedMessage = document.querySelectorAll('[data-id="' +
                         data.id + '"]');
-                if (editedMessage) {
-                    editedMessage.dataset.markdown = data.text;
-                    editedMessage.innerHTML = markdown(data.text);
+                for (var i = 0; i < editedMessage.length; ++i) {
+                    editedMessage[i].dataset.markdown = data.text;
+                    editedMessage[i].innerHTML = markdown(data.text);
                 }
                 break;
 
@@ -168,39 +169,79 @@ window.addEventListener('load', function() {
                 var votedMessage = document.querySelector('[data-id="' +
                         data.messageid + '"]');
                 if (votedMessage) {
-                    var votebox = document.querySelector(
+                    var voteboxes = document.querySelectorAll(
                         '.votebox[data-messageid="' + data.messageid + '"]');
-                    if (!votebox) {
-                        votebox = document.createElement('div');
+
+                    if (!voteboxes.length) {
+                        var votebox = document.createElement('div');
                         votebox.dataset.messageid = data.messageid;
                         votebox.className = 'votebox';
                         votedMessage.parentNode.insertBefore(votebox,
                                 votedMessage);
+                        voteboxes = [votebox];
                     }
-                    var icon = document.createElement('span');
-                    icon.className = [
-                        'fa fa-thumbs-up',
-                        'fa fa-thumbs-down',
-                        'fa fa-star',
-                        'fa fa-thumb-tack'
-                    ][data.votetype - 1];
-                    icon.dataset.votetype = data.votetype;
-                    votebox.appendChild(icon);
+
+                    for (var i = 0; i < voteboxes.length; ++i) {
+                        var votebox = voteboxes[i];
+                        var icon = document.createElement('span');
+                        icon.className = [
+                            'fa fa-thumbs-up',
+                            'fa fa-thumbs-down',
+                            'fa fa-star',
+                            'fa fa-thumb-tack'
+                        ][data.votetype - 1];
+                        icon.dataset.votetype = data.votetype;
+                        votebox.appendChild(icon);
+                    }
                 }
                 break;
 
             case 'undovote':
-                var votedMessage = document.querySelector('[data-id="' +
-                        data.messageid + '"]');
-                if (votedMessage) {
-                    var votebox = document.querySelector(
-                        '.votebox[data-messageid="' + data.messageid + '"]');
-                    if (votebox) {
-                        var voteicon = votebox.querySelector(
-                                '[data-votetype="' + data.votetype + '"]');
-                        votebox.removeChild(voteicon);
-                    }
+                var voteboxes = document.querySelectorAll(
+                    '.votebox[data-messageid="' + data.messageid + '"]');
+                for (var i = 0; i < voteboxes.length; ++i) {
+                    var votebox = voteboxes[i];
+                    var voteicon = votebox.querySelector(
+                            '[data-votetype="' + data.votetype + '"]');
+                    votebox.removeChild(voteicon);
                 }
+                break;
+
+            case 'starboard':
+                while (starredList.lastChild) {
+                    starredList.removeChild(starredList.lastChild);
+                }
+
+                data.messages.forEach(function(messageData) {
+                    var messageWrapper = document.createElement('div');
+                    messageWrapper.className = 'messageList';
+                    starredList.insertBefore(messageWrapper,
+                            starredList.firstChild);
+
+                    var starredMessage = document.createElement('div');
+                    starredMessage.dataset.id = messageData.id;
+                    starredMessage.innerHTML = markdown(messageData.text);
+                    messageWrapper.appendChild(starredMessage);
+
+                    var starCount = document.createElement('span');
+                    starCount.className = 'starInfo';
+                    starCount.textContent = messageData.starcount == 1 ?
+                        '' : messageData.starcount;
+                    var starIcon = document.createElement('span');
+                    starIcon.className = 'fa fa-star';
+                    starCount.appendChild(starIcon);
+                    messageWrapper.appendChild(starCount);
+
+                    var date = new Date(messageData.timestamp * 1000);
+                    var starredInfo = document.createElement('span');
+                    starredInfo.className = 'starInfo';
+                    starredInfo.textContent = '—' +
+                        (messageData.username ?
+                            (messageData.username + ', ') : '') +
+                        date.toDateString().split(' ').slice(1).join(' ') +
+                        ' ' + date.toTimeString().split(' ')[0];
+                    messageWrapper.appendChild(starredInfo);
+                });
                 break;
         }
     });
