@@ -92,7 +92,8 @@ window.addEventListener('load', function() {
                 newMessage.dataset.markdown = data.text;
                 newMessage.innerHTML = markdown(data.text);
 
-                newMessage.addEventListener('click', function() {
+                var hovering;
+                var showMenu = function() {
                     var oldMenu = document.getElementsByClassName('messageMenu');
                     if (oldMenu[0]) {
                         oldMenu[0].parentNode.removeChild(oldMenu[0]);
@@ -100,10 +101,16 @@ window.addEventListener('load', function() {
 
                     var menu = document.createElement('div');
                     menu.className = 'messageMenu';
-                    this.appendChild(menu);
+                    newMessage.appendChild(menu);
+
+                    var timestamp = document.createElement('a');
+                    timestamp.textContent =
+                        reltime(new Date(data.timestamp * 1000), false);
+                    menu.appendChild(timestamp);
 
                     var editLink = document.createElement('a');
-                    editLink.textContent = 'edit';
+                    editLink.className = 'fa fa-pencil';
+                    //editLink.textContent = 'edit';
                     editLink.href = 'javascript:;';
                     editLink.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -115,7 +122,13 @@ window.addEventListener('load', function() {
 
                     ['upvote', 'downvote', 'star', 'pin'].forEach(function(vote, idx) {
                         var voteLink = document.createElement('a');
-                        voteLink.textContent = vote;
+                        voteLink.className = [
+                            'fa fa-thumbs-up',
+                            'fa fa-thumbs-down',
+                            'fa fa-star',
+                            'fa fa-thumb-tack'
+                        ][idx];
+                        //voteLink.textContent = vote;
                         voteLink.href = 'javascript:;';
                         voteLink.addEventListener('click', function(e) {
                             e.preventDefault();
@@ -132,6 +145,15 @@ window.addEventListener('load', function() {
                         e.stopPropagation();
                         newMessage.removeChild(menu);
                     });
+                    menu.addEventListener('mouseleave', function() {
+                        if (hovering) newMessage.removeChild(menu);
+                    });
+                };
+
+                newMessage.addEventListener('click', showMenu);
+                newMessage.addEventListener('mouseenter', function() {
+                    hovering = true;
+                    showMenu();
                 });
 
                 if (messagesList.lastChild &&
@@ -232,14 +254,12 @@ window.addEventListener('load', function() {
                     starCount.appendChild(starIcon);
                     messageWrapper.appendChild(starCount);
 
-                    var date = new Date(messageData.timestamp * 1000);
                     var starredInfo = document.createElement('span');
                     starredInfo.className = 'starInfo';
                     starredInfo.textContent = '—' +
                         (messageData.username ?
                             (messageData.username + ', ') : '') +
-                        date.toDateString().split(' ').slice(1).join(' ') +
-                        ' ' + date.toTimeString().split(' ')[0];
+                        reltime(new Date(messageData.timestamp * 1000), true);
                     messageWrapper.appendChild(starredInfo);
                 });
                 break;
@@ -322,4 +342,15 @@ function showLoginPrompt(sock) {
 
     closeDialog = showDialog(loginForm);
     document.getElementById('usernameInput').focus();
+}
+
+function reltime(date, longFormat) {
+    // TODO make this /actually/ be relative time
+    if (longFormat) {
+        return date.toDateString().split(' ').slice(1).join(' ') + ' ' +
+            date.toTimeString().split(' ')[0];
+    } else {
+        return date.toDateString().split(' ').slice(1).join(' ') + ' ' +
+            date.toTimeString().split(' ')[0];
+    }
 }
