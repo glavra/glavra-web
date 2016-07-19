@@ -264,6 +264,12 @@ window.addEventListener('load', function() {
                     messageWrapper.appendChild(starredInfo);
                 });
                 break;
+
+            case 'error':
+                var text = document.createTextNode(data.text);
+                showDialog(text);
+                break;
+
         }
     });
 
