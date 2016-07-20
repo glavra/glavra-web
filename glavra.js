@@ -13,18 +13,14 @@ window.addEventListener('load', function() {
     var clearEdit = function() {
         if (messageEditing) {
             var editEl = document.getElementsByClassName('edit')[0];
-            if (editEl) {
-                editEl.className = editEl.className.replace(/ edit\b/, '');
-            }
+            if (editEl) editEl.classList.remove('edit');
             messageEditing = null;
         }
     };
     var clearReply = function() {
         if (messageReplying) {
             var replyEl = document.getElementsByClassName('reply')[0];
-            if (replyEl) {
-                replyEl.className = replyEl.className.replace(/ reply\b/, '');
-            }
+            if (replyEl) replyEl.classList.remove('reply');
             messageReplying = null;
         }
     };
@@ -82,7 +78,8 @@ window.addEventListener('load', function() {
         });
         var messageHTML = writer.render(reader.parse(escaped));
         if (reply) {
-            messageHTML = '<span class="fa fa-reply reply-arrow"></span>' +
+            messageHTML = '<span class="fa fa-reply reply-arrow" ' +
+                'data-replyid="' + reply + '"></span>' +
                 messageHTML;
         }
         return messageHTML;
@@ -148,7 +145,7 @@ window.addEventListener('load', function() {
                         e.preventDefault();
                         clearEdit();
                         messageEditing = data.id;
-                        newMessage.className += ' edit';
+                        newMessage.classList.add('edit');
                         messageInput.value = newMessage.dataset.markdown;
                         messageInput.focus();
                     });
@@ -161,12 +158,13 @@ window.addEventListener('load', function() {
                         e.preventDefault();
                         clearReply();
                         messageReplying = data.id;
-                        newMessage.className += ' reply';
+                        newMessage.classList.add('reply');
                         messageInput.focus();
                     });
                     menu.appendChild(replyLink);
 
-                    ['upvote', 'downvote', 'star', 'pin'].forEach(function(vote, idx) {
+                    var voteTypes = ['upvote', 'downvote', 'star', 'pin'];
+                    voteTypes.forEach(function(vote, idx) {
                         var voteLink = document.createElement('a');
                         voteLink.className = [
                             'fa fa-thumbs-up',
@@ -186,12 +184,30 @@ window.addEventListener('load', function() {
                         menu.appendChild(voteLink);
                     });
 
+                    // apparently I can't use :has in here which is super
+                    // annoying >:(
+                    var highlights = document.querySelectorAll('[data-id="' +
+                        data.replyid + '"], div > span[data-replyid="' +
+                        data.id + '"]');
+                    for (var i = 0; i < highlights.length; ++i) {
+                        if (highlights[i].tagName.toLowerCase() == 'span') {
+                            highlights[i].parentNode.classList.add('hoverreply');
+                        } else {
+                            highlights[i].classList.add('hoverreply');
+                        }
+                    }
+                };
+
+                var hideMenu = function() {
+                    newMessage.removeChild(menu);
+                    var highlights = document.getElementsByClassName('hoverreply');
+                    while (highlights.length) {
+                        highlights[0].classList.remove('hoverreply');
+                    }
                 };
 
                 newMessage.addEventListener('mouseenter', showMenu);
-                newMessage.addEventListener('mouseleave', function() {
-                    newMessage.removeChild(menu);
-                });
+                newMessage.addEventListener('mouseleave', hideMenu);
 
                 if (messagesList.lastChild &&
                         messagesList.lastChild.dataset.userid == data.userid) {

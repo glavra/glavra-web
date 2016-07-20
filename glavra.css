@@ -75,7 +75,7 @@ html {
     position: relative;
 }
 
-.messageList > div.reply {
+.messageList > div.reply, .messageList > div.hoverreply {
     background-color: #ccffcc;
 }
 
