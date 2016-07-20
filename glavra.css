@@ -99,7 +99,7 @@ html {
     z-index: 1;
 }
 
-.messageList > div > p {
+.messageList > div p {
     margin: 2px;
 }
 
@@ -149,4 +149,10 @@ html {
     font-size: 10pt;
     color: #888888;
     padding: 0px 3px;
+}
+
+blockquote {
+    border-left: 3px solid #888888;
+    margin-left: 5px;
+    padding-left: 5px;
 }
