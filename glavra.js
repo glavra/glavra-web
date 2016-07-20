@@ -65,7 +65,8 @@ window.addEventListener('load', function() {
         clearReply();
     });
     messageInput.addEventListener('keypress', function(e) {
-        if (e.which == 13) {
+        if (e.which == 13 && !e.ctrlKey && !e.shiftKey && !e.altKey &&
+                !e.metaKey) {
             e.preventDefault();
             sendMessage();
         }
