@@ -79,6 +79,10 @@ html {
     background-color: #ccffcc;
 }
 
+.messageList > div.jumpHighlight {
+    background-color: #ffffcc;
+}
+
 .reply-arrow {
     float: left;
     margin-right: 3px;

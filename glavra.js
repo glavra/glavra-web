@@ -78,11 +78,33 @@ window.addEventListener('load', function() {
         });
         var messageHTML = writer.render(reader.parse(escaped));
         if (reply) {
-            messageHTML = '<span class="fa fa-reply reply-arrow" ' +
-                'data-replyid="' + reply + '"></span>' +
+            messageHTML = '<a class="fa fa-reply reply-arrow" ' +
+                'data-replyid="' + reply + '" href="javascript:;"></a>' +
                 messageHTML;
         }
         return messageHTML;
+    };
+    var attachReplyHandler = function(message) {
+        var child = message.firstChild;
+        if (child && child.tagName.toLowerCase() == 'a') {
+            child.addEventListener('click', function(e) {
+                e.preventDefault();
+                jumpTo(child.dataset.replyid);
+            });
+        }
+    };
+
+    var jumpTo = function(id) {
+        var message = document.querySelector('#messages [data-id="' + id + '"]');
+        if (message) {
+            message.scrollIntoView();
+            message.classList.add('jumpHighlight');
+            setTimeout(function() {
+                message.classList.remove('jumpHighlight');
+            }, 3000);
+        } else {
+            // TODO transcript
+        }
     };
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
@@ -121,6 +143,7 @@ window.addEventListener('load', function() {
                 newMessage.dataset.id = data.id;
                 newMessage.dataset.markdown = data.text;
                 newMessage.innerHTML = renderMessage(data.text, data.replyid);
+                attachReplyHandler(newMessage);
 
                 var menu;
                 var showMenu = function() {
@@ -238,6 +261,7 @@ window.addEventListener('load', function() {
                     editedMessage[i].dataset.markdown = data.text;
                     editedMessage[i].innerHTML = renderMessage(data.text,
                             data.replyid);
+                    attachReplyHandler(editedMessage[i]);
                 }
                 break;
 
