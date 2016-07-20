@@ -163,30 +163,29 @@ window.addEventListener('load', function() {
                         fmttime(new Date(data.timestamp * 1000), false);
                     menu.appendChild(timestamp);
 
-                    var editLink = document.createElement('a');
-                    editLink.className = 'fa fa-pencil';
-                    editLink.href = 'javascript:;';
-                    editLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        clearEdit();
-                        messageEditing = data.id;
-                        newMessage.classList.add('edit');
-                        messageInput.value = newMessage.dataset.markdown;
-                        messageInput.focus();
+                    var actions = ['edit', 'reply'];
+                    actions.forEach(function(action, idx) {
+                        var actionLink = document.createElement('a');
+                        actionLink.className = [
+                            'fa fa-pencil',
+                            'fa fa-reply'
+                        ][idx];
+                        actionLink.href = 'javascript:;';
+                        actionLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            if (action == 'edit') {
+                                clearEdit();
+                                messageEditing = data.id;
+                                messageInput.value = newMessage.dataset.markdown;
+                            } else if (action == 'reply') {
+                                clearReply();
+                                messageReplying = data.id;
+                            }
+                            newMessage.classList.add(action);
+                            messageInput.focus();
+                        });
+                        menu.appendChild(actionLink);
                     });
-                    menu.appendChild(editLink);
-
-                    var replyLink = document.createElement('a');
-                    replyLink.className = 'fa fa-reply';
-                    replyLink.href = 'javascript:;';
-                    replyLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        clearReply();
-                        messageReplying = data.id;
-                        newMessage.classList.add('reply');
-                        messageInput.focus();
-                    });
-                    menu.appendChild(replyLink);
 
                     var voteTypes = ['upvote', 'downvote', 'star', 'pin'];
                     voteTypes.forEach(function(vote, idx) {
