@@ -8,11 +8,31 @@ var strings = {
 
 window.addEventListener('load', function() {
 
-    var loggedIn = false, messageEditing;
+    var loggedIn = false, messageEditing = null, messageReplying = null;
+
+    var clearEdit = function() {
+        if (messageEditing) {
+            var editEl = document.getElementsByClassName('edit')[0];
+            if (editEl) {
+                editEl.className = editEl.className.replace(/ edit\b/, '');
+            }
+            messageEditing = null;
+        }
+    };
+    var clearReply = function() {
+        if (messageReplying) {
+            var replyEl = document.getElementsByClassName('reply')[0];
+            if (replyEl) {
+                replyEl.className = replyEl.className.replace(/ reply\b/, '');
+            }
+            messageReplying = null;
+        }
+    };
 
     var messagesList = document.getElementById('messages');
     var starredList = document.getElementById('starred');
-    var inputForm = document.getElementById('inputForm');
+    var sendButton = document.getElementById('send');
+    var cancelButton = document.getElementById('cancel');
     var messageInput = document.getElementById('message');
 
     var sendMessage = function() {
@@ -21,23 +41,31 @@ window.addEventListener('load', function() {
                 sock.send(JSON.stringify({
                     type: 'edit',
                     id: messageEditing,
+                    replyid: messageReplying,
                     text: messageInput.value
                 }));
                 messageInput.value = '';
-                messageEditing = null;
+                clearEdit();
             } else {
                 sock.send(JSON.stringify({
                     type: 'message',
+                    replyid: messageReplying,
                     text: messageInput.value
                 }));
                 messageInput.value = '';
             }
+            clearReply();
         } else showLoginPrompt(sock);
     };
 
-    inputForm.addEventListener('submit', function(e) {
+    sendButton.addEventListener('click', function(e) {
         e.preventDefault();
         sendMessage();
+    });
+    cancelButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        clearEdit();
+        clearReply();
     });
     messageInput.addEventListener('keypress', function(e) {
         if (e.which == 13) {
@@ -48,11 +76,16 @@ window.addEventListener('load', function() {
 
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer({safe: true});
-    var markdown = function(text) {
+    var renderMessage = function(text, reply) {
         var escaped = text.replace(/[<&]/g, function(m) {
             return ({'<': '&lt;', '&': '&amp;'})[m];
         });
-        return writer.render(reader.parse(escaped));
+        var messageHTML = writer.render(reader.parse(escaped));
+        if (reply) {
+            messageHTML = '<span class="fa fa-reply reply-arrow"></span>' +
+                messageHTML;
+        }
+        return messageHTML;
     };
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
@@ -90,16 +123,16 @@ window.addEventListener('load', function() {
                 var newMessage = document.createElement('div');
                 newMessage.dataset.id = data.id;
                 newMessage.dataset.markdown = data.text;
-                newMessage.innerHTML = markdown(data.text);
+                newMessage.innerHTML = renderMessage(data.text, data.replyid);
 
-                var hovering;
+                var menu;
                 var showMenu = function() {
                     var oldMenu = document.getElementsByClassName('messageMenu');
                     if (oldMenu[0]) {
                         oldMenu[0].parentNode.removeChild(oldMenu[0]);
                     }
 
-                    var menu = document.createElement('div');
+                    menu = document.createElement('div');
                     menu.className = 'messageMenu';
                     newMessage.appendChild(menu);
 
@@ -110,15 +143,28 @@ window.addEventListener('load', function() {
 
                     var editLink = document.createElement('a');
                     editLink.className = 'fa fa-pencil';
-                    //editLink.textContent = 'edit';
                     editLink.href = 'javascript:;';
                     editLink.addEventListener('click', function(e) {
                         e.preventDefault();
+                        clearEdit();
                         messageEditing = data.id;
+                        newMessage.className += ' edit';
                         messageInput.value = newMessage.dataset.markdown;
                         messageInput.focus();
                     });
                     menu.appendChild(editLink);
+
+                    var replyLink = document.createElement('a');
+                    replyLink.className = 'fa fa-reply';
+                    replyLink.href = 'javascript:;';
+                    replyLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        clearReply();
+                        messageReplying = data.id;
+                        newMessage.className += ' reply';
+                        messageInput.focus();
+                    });
+                    menu.appendChild(replyLink);
 
                     ['upvote', 'downvote', 'star', 'pin'].forEach(function(vote, idx) {
                         var voteLink = document.createElement('a');
@@ -128,7 +174,6 @@ window.addEventListener('load', function() {
                             'fa fa-star',
                             'fa fa-thumb-tack'
                         ][idx];
-                        //voteLink.textContent = vote;
                         voteLink.href = 'javascript:;';
                         voteLink.addEventListener('click', function(e) {
                             e.preventDefault();
@@ -141,19 +186,11 @@ window.addEventListener('load', function() {
                         menu.appendChild(voteLink);
                     });
 
-                    menu.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        newMessage.removeChild(menu);
-                    });
-                    menu.addEventListener('mouseleave', function() {
-                        if (hovering) newMessage.removeChild(menu);
-                    });
                 };
 
-                newMessage.addEventListener('click', showMenu);
-                newMessage.addEventListener('mouseenter', function() {
-                    hovering = true;
-                    showMenu();
+                newMessage.addEventListener('mouseenter', showMenu);
+                newMessage.addEventListener('mouseleave', function() {
+                    newMessage.removeChild(menu);
                 });
 
                 if (messagesList.lastChild &&
@@ -183,7 +220,8 @@ window.addEventListener('load', function() {
                         data.id + '"]');
                 for (var i = 0; i < editedMessage.length; ++i) {
                     editedMessage[i].dataset.markdown = data.text;
-                    editedMessage[i].innerHTML = markdown(data.text);
+                    editedMessage[i].innerHTML = renderMessage(data.text,
+                            data.replyid);
                 }
                 break;
 
@@ -242,7 +280,10 @@ window.addEventListener('load', function() {
 
                     var starredMessage = document.createElement('div');
                     starredMessage.dataset.id = messageData.id;
-                    starredMessage.innerHTML = markdown(messageData.text);
+                    // messageData.reply is intentionally excluded here
+                    // because there's no sense in rendering a reply on the
+                    // starboard
+                    starredMessage.innerHTML = renderMessage(messageData.text);
                     messageWrapper.appendChild(starredMessage);
 
                     var starCount = document.createElement('span');
