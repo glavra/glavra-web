@@ -211,10 +211,10 @@ window.addEventListener('load', function() {
                     // apparently I can't use :has in here which is super
                     // annoying >:(
                     var highlights = document.querySelectorAll('[data-id="' +
-                        data.replyid + '"], div > span[data-replyid="' +
+                        data.replyid + '"], div > a[data-replyid="' +
                         data.id + '"]');
                     for (var i = 0; i < highlights.length; ++i) {
-                        if (highlights[i].tagName.toLowerCase() == 'span') {
+                        if (highlights[i].tagName.toLowerCase() == 'a') {
                             highlights[i].parentNode.classList.add('hoverreply');
                         } else {
                             highlights[i].classList.add('hoverreply');
