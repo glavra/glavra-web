@@ -92,6 +92,10 @@ html {
     background-color: #ffcccc;
 }
 
+.messageList > div > .deleted {
+    color: #888888;
+}
+
 .messageList > div.votebox {
     position: absolute;
     right: 5px;

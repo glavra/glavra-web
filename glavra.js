@@ -75,6 +75,9 @@ window.addEventListener('load', function() {
     var reader = new commonmark.Parser();
     var writer = new commonmark.HtmlRenderer({safe: true});
     var renderMessage = function(text, reply) {
+        if (text === '') {
+            return '<p class="deleted">(deleted)</p>';
+        }
         var escaped = text.replace(/[<&]/g, function(m) {
             return ({'<': '&lt;', '&': '&amp;'})[m];
         });
@@ -207,6 +210,18 @@ window.addEventListener('load', function() {
                         });
                         menu.appendChild(voteLink);
                     });
+
+                    var deleteLink = document.createElement('a');
+                    deleteLink.className = 'fa fa-trash';
+                    deleteLink.href = 'javascript:;';
+                    deleteLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        sock.send(JSON.stringify({
+                            type: 'delete',
+                            id: data.id
+                        }));
+                    });
+                    menu.appendChild(deleteLink);
 
                     // apparently I can't use :has in here which is super
                     // annoying >:(
