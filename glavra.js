@@ -78,9 +78,8 @@ window.addEventListener('load', function() {
         if (text === '') {
             return '<p class="deleted">(deleted)</p>';
         }
-        var escaped = text.replace(/[<&]/g, function(m) {
-            return ({'<': '&lt;', '&': '&amp;'})[m];
-        });
+        // TODO fix this ugly hack, maybe by hooking into HtmlRenderer?
+        var escaped = text.replace(/<([^:<]*)>/g, '&lt;$1>');
         var messageHTML = writer.render(reader.parse(escaped));
         if (reply) {
             messageHTML = '<a class="fa fa-reply reply-arrow" ' +
