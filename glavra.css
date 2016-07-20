@@ -67,7 +67,7 @@ html {
     border-radius: 3px;
 }
 
-#starred > .messageList {
+#pinned > .messageList, #starred > .messageList {
     margin: 3px 0px;
 }
 

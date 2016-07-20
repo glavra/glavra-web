@@ -27,6 +27,7 @@ window.addEventListener('load', function() {
 
     var messagesList = document.getElementById('messages');
     var starredList = document.getElementById('starred');
+    var pinnedList = document.getElementById('pinned');
     var sendButton = document.getElementById('send');
     var cancelButton = document.getElementById('cancel');
     var messageInput = document.getElementById('message');
@@ -308,32 +309,33 @@ window.addEventListener('load', function() {
                 break;
 
             case 'starboard':
-                while (starredList.lastChild) {
-                    starredList.removeChild(starredList.lastChild);
-                }
+                var votetype = ['', '', '', 'star', 'pin'][data.votetype];
+                var list = votetype == 'star' ? starredList : pinnedList;
+
+                while (list.lastChild) list.removeChild(list.lastChild);
 
                 data.messages.forEach(function(messageData) {
                     var messageWrapper = document.createElement('div');
                     messageWrapper.className = 'messageList';
-                    starredList.insertBefore(messageWrapper,
-                            starredList.firstChild);
+                    list.insertBefore(messageWrapper, list.firstChild);
 
-                    var starredMessage = document.createElement('div');
-                    starredMessage.dataset.id = messageData.id;
+                    var votedMessage = document.createElement('div');
+                    votedMessage.dataset.id = messageData.id;
                     // messageData.reply is intentionally excluded here
                     // because there's no sense in rendering a reply on the
                     // starboard
-                    starredMessage.innerHTML = renderMessage(messageData.text);
-                    messageWrapper.appendChild(starredMessage);
+                    votedMessage.innerHTML = renderMessage(messageData.text);
+                    messageWrapper.appendChild(votedMessage);
 
-                    var starCount = document.createElement('span');
-                    starCount.className = 'starInfo';
-                    starCount.textContent = messageData.starcount == 1 ?
-                        '' : messageData.starcount;
-                    var starIcon = document.createElement('span');
-                    starIcon.className = 'fa fa-star';
-                    starCount.appendChild(starIcon);
-                    messageWrapper.appendChild(starCount);
+                    var voteCount = document.createElement('span');
+                    voteCount.className = 'starInfo';
+                    voteCount.textContent = messageData.votecount == 1 ?
+                        '' : messageData.votecount;
+                    var voteIcon = document.createElement('span');
+                    voteIcon.className = 'fa fa-' + (votetype == 'star' ?
+                        'star' : 'thumb-tack');
+                    voteCount.appendChild(voteIcon);
+                    messageWrapper.appendChild(voteCount);
 
                     var starredInfo = document.createElement('span');
                     starredInfo.className = 'starInfo';
