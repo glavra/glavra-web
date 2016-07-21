@@ -6,6 +6,18 @@ window.addEventListener('load', function() {
     // needed by 'starboard'
     var starredList = document.getElementById('starred');
     var pinnedList = document.getElementById('pinned');
+    // needed by 'message', 'starboard', and 'history'
+    var timestampLink = function(text, jumpid) {
+        var link = document.createElement('a');
+        link.textContent = text;
+        link.href = 'javascript:;'; // TODO permalink
+        // TODO exact time on hover
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            transcript.jumpTo(jumpid);
+        });
+        return link;
+    };
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
 
@@ -53,9 +65,8 @@ window.addEventListener('load', function() {
                     menu.className = 'messageMenu';
                     message.appendChild(menu);
 
-                    var timestamp = document.createElement('a');
-                    timestamp.textContent =
-                        strings.fmttime(new Date(data.timestamp * 1000), false);
+                    var timestamp = timestampLink(strings.fmttime(
+                        new Date(data.timestamp * 1000), false), data.id);
                     menu.appendChild(timestamp);
 
                     var actions = ['edit', 'reply'];
@@ -251,9 +262,11 @@ window.addEventListener('load', function() {
                     starredInfo.className = 'miniInfo';
                     starredInfo.textContent = '—' +
                         (messageData.username ?
-                            (messageData.username + ', ') : '') +
-                        strings.fmttime(new Date(messageData.timestamp * 1000),
-                            true) + ' ago';
+                            (messageData.username + ', ') : '');
+                    var timestamp = timestampLink(strings.fmttime(
+                        new Date(messageData.timestamp * 1000), true),
+                        messageData.id);
+                    starredInfo.appendChild(timestamp);
                     messageWrapper.appendChild(starredInfo);
                 });
                 break;
@@ -284,9 +297,11 @@ window.addEventListener('load', function() {
 
                     var timestamp = document.createElement('span');
                     timestamp.className = 'miniInfo';
-                    timestamp.textContent = 'revised ' +
-                        strings.fmttime(new Date(revision.timestamp * 1000),
-                            true) + ' ago';
+                    timestamp.textContent = 'revised ';
+                    var tsLink = timestampLink(strings.fmttime(
+                        new Date(revision.timestamp * 1000), true),
+                        revision.id);
+                    timestamp.appendChild(tsLink);
                     list.appendChild(timestamp);
                 });
                 dialog.show(list);

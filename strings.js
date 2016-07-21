@@ -10,12 +10,12 @@ var strings = {
         if (relative) {
             var now = new Date();
             var seconds = (now.getTime() - date.getTime()) / 1000;
-            if (seconds < 60) return Math.floor(seconds) + 's';
+            if (seconds < 60) return Math.floor(seconds) + 's ago';
             var minutes = seconds / 60;
-            if (minutes < 60) return Math.floor(minutes) + 'm';
+            if (minutes < 60) return Math.floor(minutes) + 'm ago';
             var hours = minutes / 60;
-            if (hours < 24) return Math.floor(hours) + 'h';
-            if (days < 32) return days + 'd';
+            if (hours < 24) return Math.floor(hours) + 'h ago';
+            if (days < 32) return days + 'd ago';
             return fmttime(date, false);
         } else {
             return date.toLocaleTimeString() + (days ?
