@@ -238,7 +238,7 @@ window.addEventListener('load', function() {
                     messageWrapper.appendChild(message);
 
                     var voteCount = document.createElement('span');
-                    voteCount.className = 'starInfo';
+                    voteCount.className = 'miniInfo';
                     voteCount.textContent = messageData.votecount == 1 ?
                         '' : messageData.votecount;
                     var voteIcon = document.createElement('span');
@@ -248,7 +248,7 @@ window.addEventListener('load', function() {
                     messageWrapper.appendChild(voteCount);
 
                     var starredInfo = document.createElement('span');
-                    starredInfo.className = 'starInfo';
+                    starredInfo.className = 'miniInfo';
                     starredInfo.textContent = '—' +
                         (messageData.username ?
                             (messageData.username + ', ') : '') +
@@ -266,7 +266,7 @@ window.addEventListener('load', function() {
                 var list = document.createElement('div');
 
                 var original = document.createElement('span');
-                original.className = 'starInfo';
+                original.className = 'miniInfo';
                 original.textContent = 'original revision';
                 list.appendChild(original);
 
@@ -283,7 +283,7 @@ window.addEventListener('load', function() {
                     messageWrapper.appendChild(message);
 
                     var timestamp = document.createElement('span');
-                    timestamp.className = 'starInfo';
+                    timestamp.className = 'miniInfo';
                     timestamp.textContent = 'revised ' +
                         strings.fmttime(new Date(revision.timestamp * 1000),
                             true) + ' ago';
