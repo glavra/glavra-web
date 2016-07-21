@@ -143,11 +143,11 @@ window.addEventListener('load', function() {
                 break;
 
             case 'message':
-                var newMessage = document.createElement('div');
-                newMessage.dataset.id = data.id;
-                newMessage.dataset.markdown = data.text;
-                newMessage.innerHTML = renderMessage(data.text, data.replyid);
-                attachReplyHandler(newMessage);
+                var message = document.createElement('div');
+                message.dataset.id = data.id;
+                message.dataset.markdown = data.text;
+                message.innerHTML = renderMessage(data.text, data.replyid);
+                attachReplyHandler(message);
 
                 var menu;
                 var showMenu = function() {
@@ -158,7 +158,7 @@ window.addEventListener('load', function() {
 
                     menu = document.createElement('div');
                     menu.className = 'messageMenu';
-                    newMessage.appendChild(menu);
+                    message.appendChild(menu);
 
                     var timestamp = document.createElement('a');
                     timestamp.textContent =
@@ -178,12 +178,12 @@ window.addEventListener('load', function() {
                             if (action == 'edit') {
                                 clearEdit();
                                 messageEditing = data.id;
-                                messageInput.value = newMessage.dataset.markdown;
+                                messageInput.value = message.dataset.markdown;
                             } else if (action == 'reply') {
                                 clearReply();
                                 messageReplying = data.id;
                             }
-                            newMessage.classList.add(action);
+                            message.classList.add(action);
                             messageInput.focus();
                         });
                         menu.appendChild(actionLink);
@@ -210,17 +210,23 @@ window.addEventListener('load', function() {
                         menu.appendChild(voteLink);
                     });
 
-                    var deleteLink = document.createElement('a');
-                    deleteLink.className = 'fa fa-trash';
-                    deleteLink.href = 'javascript:;';
-                    deleteLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        sock.send(JSON.stringify({
-                            type: 'delete',
-                            id: data.id
-                        }));
+                    var queryTypes = ['delete', 'history'];
+                    queryTypes.forEach(function(query, idx) {
+                        var queryLink = document.createElement('a');
+                        queryLink.className = [
+                            'fa fa-trash',
+                            'fa fa-history'
+                        ][idx];
+                        queryLink.href = 'javascript:;';
+                        queryLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            sock.send(JSON.stringify({
+                                type: query,
+                                id: data.id
+                            }));
+                        });
+                        menu.appendChild(queryLink);
                     });
-                    menu.appendChild(deleteLink);
 
                     // apparently I can't use :has in here which is super
                     // annoying >:(
@@ -237,19 +243,19 @@ window.addEventListener('load', function() {
                 };
 
                 var hideMenu = function() {
-                    newMessage.removeChild(menu);
+                    message.removeChild(menu);
                     var highlights = document.getElementsByClassName('hoverreply');
                     while (highlights.length) {
                         highlights[0].classList.remove('hoverreply');
                     }
                 };
 
-                newMessage.addEventListener('mouseenter', showMenu);
-                newMessage.addEventListener('mouseleave', hideMenu);
+                message.addEventListener('mouseenter', showMenu);
+                message.addEventListener('mouseleave', hideMenu);
 
                 if (messagesList.lastChild &&
                         messagesList.lastChild.dataset.userid == data.userid) {
-                    messagesList.lastChild.lastChild.appendChild(newMessage);
+                    messagesList.lastChild.lastChild.appendChild(message);
                 } else {
                     var monologue = document.createElement('div');
                     monologue.dataset.userid = data.userid;
@@ -264,26 +270,26 @@ window.addEventListener('load', function() {
                     var messageList = document.createElement('div');
                     messageList.className = 'messageList';
                     monologue.appendChild(messageList);
-                    messageList.appendChild(newMessage);
+                    messageList.appendChild(message);
                 }
                 messagesList.scrollTo(0, messagesList.scrollHeight);
                 break;
 
             case 'edit':
-                var editedMessage = document.querySelectorAll('[data-id="' +
+                var message = document.querySelectorAll('[data-id="' +
                         data.id + '"]');
-                for (var i = 0; i < editedMessage.length; ++i) {
-                    editedMessage[i].dataset.markdown = data.text;
-                    editedMessage[i].innerHTML = renderMessage(data.text,
+                for (var i = 0; i < message.length; ++i) {
+                    message[i].dataset.markdown = data.text;
+                    message[i].innerHTML = renderMessage(data.text,
                             data.replyid);
-                    attachReplyHandler(editedMessage[i]);
+                    attachReplyHandler(message[i]);
                 }
                 break;
 
             case 'vote':
-                var votedMessage = document.querySelector('[data-id="' +
+                var message = document.querySelector('[data-id="' +
                         data.messageid + '"]');
-                if (votedMessage) {
+                if (message) {
                     var voteboxes = document.querySelectorAll(
                         '.votebox[data-messageid="' + data.messageid + '"]');
 
@@ -291,8 +297,8 @@ window.addEventListener('load', function() {
                         var votebox = document.createElement('div');
                         votebox.dataset.messageid = data.messageid;
                         votebox.className = 'votebox';
-                        votedMessage.parentNode.insertBefore(votebox,
-                                votedMessage);
+                        message.parentNode.insertBefore(votebox,
+                                message);
                         voteboxes = [votebox];
                     }
 
@@ -333,13 +339,13 @@ window.addEventListener('load', function() {
                     messageWrapper.className = 'messageList';
                     list.insertBefore(messageWrapper, list.firstChild);
 
-                    var votedMessage = document.createElement('div');
-                    votedMessage.dataset.id = messageData.id;
+                    var message = document.createElement('div');
+                    message.dataset.id = messageData.id;
                     // messageData.reply is intentionally excluded here
                     // because there's no sense in rendering a reply on the
                     // starboard
-                    votedMessage.innerHTML = renderMessage(messageData.text);
-                    messageWrapper.appendChild(votedMessage);
+                    message.innerHTML = renderMessage(messageData.text);
+                    messageWrapper.appendChild(message);
 
                     var voteCount = document.createElement('span');
                     voteCount.className = 'starInfo';
@@ -365,6 +371,10 @@ window.addEventListener('load', function() {
             case 'error':
                 var text = document.createTextNode(data.text);
                 showDialog(text);
+                break;
+
+            case 'history':
+                // TODO
                 break;
 
         }
