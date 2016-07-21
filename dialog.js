@@ -73,8 +73,9 @@ var dialog = {
     },
 
     showText: function(text) {
-        var textNode = document.createTextNode(text);
-        dialog.show(textNode);
+        var para = document.createElement('p');
+        para.textContent = text;
+        dialog.show(para);
     }
 
 };
