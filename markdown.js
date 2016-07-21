@@ -14,7 +14,7 @@ var markdown = (function() {
                     'data-replyid="' + reply + '" href="javascript:;"></a>' +
                     messageHTML;
             }
-            return messageHTML;
+            return messageHTML.autoLink();
         },
         attachReplyHandler: function(message) {
             var child = message.firstChild;
