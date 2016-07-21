@@ -263,7 +263,33 @@ window.addEventListener('load', function() {
                 break;
 
             case 'history':
-                // TODO
+                var list = document.createElement('div');
+
+                var original = document.createElement('span');
+                original.className = 'starInfo';
+                original.textContent = 'original revision';
+                list.appendChild(original);
+
+                data.revisions.forEach(function(revision) {
+                    var messageWrapper = document.createElement('div');
+                    messageWrapper.className = 'messageList';
+                    list.appendChild(messageWrapper);
+
+                    var message = document.createElement('div');
+                    // excluding revision.reply here for similar reasons as
+                    // in the starboard above (in fact, TODO: merge very
+                    // similar code into function)
+                    message.innerHTML = markdown.render(revision.text);
+                    messageWrapper.appendChild(message);
+
+                    var timestamp = document.createElement('span');
+                    timestamp.className = 'starInfo';
+                    timestamp.textContent = 'revised ' +
+                        strings.fmttime(new Date(revision.timestamp * 1000),
+                            true) + ' ago';
+                    list.appendChild(timestamp);
+                });
+                dialog.show(list);
                 break;
 
         }
