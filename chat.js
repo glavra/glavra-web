@@ -1,5 +1,12 @@
 window.addEventListener('load', function() {
 
+    var roomId, roomMatch;
+    if (roomMatch = location.search.slice(1).match(/(^|&)room=(\d+)/)) {
+        roomId = +roomMatch[2];
+    } else if (roomMatch = location.pathname.match(/^\/chat\/(\d+)$/)) {
+        roomId = +roomMatch[1];
+    } else return; // TODO room list?
+
     // needed by 'message'
     var messagesList = document.getElementById('messages');
     var messageInput = document.getElementById('message');
@@ -19,7 +26,7 @@ window.addEventListener('load', function() {
         return link;
     };
 
-    var sock = new WebSocket('ws://127.0.0.1:3012');
+    var sock = new WebSocket('ws://127.0.0.1:3012?room=' + roomId);
 
     sock.addEventListener('open', function() {
         dialog.showLoginPrompt(sock);
