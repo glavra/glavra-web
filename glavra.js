@@ -1,68 +1,37 @@
-// TODO make this not terrible
-var strings = {
-    authSuccess: 'You have successfully been authenticated.',
-    authFailure: 'Your username or password was incorrect.',
-    registerSuccess: 'Your account has been created.',
-    registerFailure: 'Someone already has that username.'
-};
-
 window.addEventListener('load', function() {
 
-    var loggedIn = false, messageEditing = null, messageReplying = null;
-
-    var clearEdit = function() {
-        if (messageEditing) {
-            var editEl = document.getElementsByClassName('edit')[0];
-            if (editEl) editEl.classList.remove('edit');
-            messageEditing = null;
-        }
-    };
-    var clearReply = function() {
-        if (messageReplying) {
-            var replyEl = document.getElementsByClassName('reply')[0];
-            if (replyEl) replyEl.classList.remove('reply');
-            messageReplying = null;
-        }
-    };
-
-    var messagesList = document.getElementById('messages');
-    var starredList = document.getElementById('starred');
-    var pinnedList = document.getElementById('pinned');
     var sendButton = document.getElementById('send');
     var cancelButton = document.getElementById('cancel');
     var messageInput = document.getElementById('message');
 
     var sendMessage = function() {
-        if (loggedIn) {
-            if (messageEditing) {
-                sock.send(JSON.stringify({
-                    type: 'edit',
-                    id: messageEditing,
-                    replyid: messageReplying,
-                    text: messageInput.value
-                }));
-                messageInput.value = '';
-                clearEdit();
-            } else {
-                sock.send(JSON.stringify({
-                    type: 'message',
-                    replyid: messageReplying,
-                    text: messageInput.value
-                }));
-                messageInput.value = '';
-            }
-            clearReply();
-        } else showLoginPrompt(sock);
+        if (messageStatus.edit) {
+            sock.send(JSON.stringify({
+                type: 'edit',
+                id: messageStatus.edit,
+                replyid: messageStatus.reply,
+                text: messageInput.value
+            }));
+            messageInput.value = '';
+            messageStatus.clear('edit');
+        } else {
+            sock.send(JSON.stringify({
+                type: 'message',
+                replyid: messageStatus.reply,
+                text: messageInput.value
+            }));
+            messageInput.value = '';
+        }
+        messageStatus.clear('reply');
     };
-
     sendButton.addEventListener('click', function(e) {
         e.preventDefault();
         sendMessage();
     });
     cancelButton.addEventListener('click', function(e) {
         e.preventDefault();
-        clearEdit();
-        clearReply();
+        messageStatus.clear('edit');
+        messageStatus.clear('reply');
     });
     messageInput.addEventListener('keypress', function(e) {
         if (e.which == 13 && !e.ctrlKey && !e.shiftKey && !e.altKey &&
@@ -72,73 +41,33 @@ window.addEventListener('load', function() {
         }
     });
 
-    var reader = new commonmark.Parser();
-    var writer = new commonmark.HtmlRenderer({safe: true});
-    var renderMessage = function(text, reply) {
-        if (text === '') {
-            return '<p class="deleted">(deleted)</p>';
-        }
-        // TODO fix this ugly hack, maybe by hooking into HtmlRenderer?
-        var escaped = text.replace(/<([^:<]*)>/g, '&lt;$1>');
-        var messageHTML = writer.render(reader.parse(escaped));
-        if (reply) {
-            messageHTML = '<a class="fa fa-reply reply-arrow" ' +
-                'data-replyid="' + reply + '" href="javascript:;"></a>' +
-                messageHTML;
-        }
-        return messageHTML;
-    };
-    var attachReplyHandler = function(message) {
-        var child = message.firstChild;
-        if (child && child.tagName.toLowerCase() == 'a') {
-            child.addEventListener('click', function(e) {
-                e.preventDefault();
-                jumpTo(child.dataset.replyid);
-            });
-        }
-    };
-
-    var jumpTo = function(id) {
-        var message = document.querySelector('#messages [data-id="' + id + '"]');
-        if (message) {
-            message.scrollIntoView();
-            message.classList.add('jumpHighlight');
-            setTimeout(function() {
-                message.classList.remove('jumpHighlight');
-            }, 3000);
-        } else {
-            // TODO transcript
-        }
-    };
+    var messagesList = document.getElementById('messages');
+    var starredList = document.getElementById('starred');
+    var pinnedList = document.getElementById('pinned');
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
     sock.addEventListener('open', function() {
-        showLoginPrompt(sock);
+        dialog.showLoginPrompt(sock);
     });
     sock.addEventListener('message', function(e) {
         var data = JSON.parse(e.data);
         console.log(data);
         switch (data.type) {
-
             case 'auth':
                 if (data.success) {
-                    loggedIn = true;
-                    var text = document.createTextNode(strings.authSuccess);
-                    showDialog(text);
+                    // TODO update logged in
+                    dialog.showText(strings.authSuccess);
                 } else {
-                    var text = document.createTextNode(strings.authFailure);
-                    showDialog(text);
+                    dialog.showText(strings.authFailure);
                 }
                 break;
 
             case 'register':
                 if (data.success) {
-                    loggedIn = true;
-                    var text = document.createTextNode(strings.registerSuccess);
-                    showDialog(text);
+                    // TODO update logged in
+                    dialog.showText(strings.registerSuccess);
                 } else {
-                    var text = document.createTextNode(strings.registerFailure);
-                    showDialog(text);
+                    dialog.showText(strings.registerFailure);
                 }
                 break;
 
@@ -146,8 +75,8 @@ window.addEventListener('load', function() {
                 var message = document.createElement('div');
                 message.dataset.id = data.id;
                 message.dataset.markdown = data.text;
-                message.innerHTML = renderMessage(data.text, data.replyid);
-                attachReplyHandler(message);
+                message.innerHTML = markdown.render(data.text, data.replyid);
+                markdown.attachReplyHandler(message);
 
                 var menu;
                 var showMenu = function() {
@@ -162,7 +91,7 @@ window.addEventListener('load', function() {
 
                     var timestamp = document.createElement('a');
                     timestamp.textContent =
-                        fmttime(new Date(data.timestamp * 1000), false);
+                        strings.fmttime(new Date(data.timestamp * 1000), false);
                     menu.appendChild(timestamp);
 
                     var actions = ['edit', 'reply'];
@@ -176,13 +105,10 @@ window.addEventListener('load', function() {
                         actionLink.addEventListener('click', function(e) {
                             e.preventDefault();
                             if (action == 'edit') {
-                                clearEdit();
-                                messageEditing = data.id;
                                 messageInput.value = message.dataset.markdown;
-                            } else if (action == 'reply') {
-                                clearReply();
-                                messageReplying = data.id;
                             }
+                            messageStatus.clear(action);
+                            messageStatus[action] = data.id;
                             message.classList.add(action);
                             messageInput.focus();
                         });
@@ -280,9 +206,9 @@ window.addEventListener('load', function() {
                         data.id + '"]');
                 for (var i = 0; i < message.length; ++i) {
                     message[i].dataset.markdown = data.text;
-                    message[i].innerHTML = renderMessage(data.text,
+                    message[i].innerHTML = markdown.render(data.text,
                             data.replyid);
-                    attachReplyHandler(message[i]);
+                    markdown.attachReplyHandler(message[i]);
                 }
                 break;
 
@@ -344,7 +270,7 @@ window.addEventListener('load', function() {
                     // messageData.reply is intentionally excluded here
                     // because there's no sense in rendering a reply on the
                     // starboard
-                    message.innerHTML = renderMessage(messageData.text);
+                    message.innerHTML = markdown.render(messageData.text);
                     messageWrapper.appendChild(message);
 
                     var voteCount = document.createElement('span');
@@ -362,15 +288,14 @@ window.addEventListener('load', function() {
                     starredInfo.textContent = '—' +
                         (messageData.username ?
                             (messageData.username + ', ') : '') +
-                        fmttime(new Date(messageData.timestamp * 1000), true) +
-                        ' ago';
+                        strings.fmttime(new Date(messageData.timestamp * 1000),
+                            true) + ' ago';
                     messageWrapper.appendChild(starredInfo);
                 });
                 break;
 
             case 'error':
-                var text = document.createTextNode(data.text);
-                showDialog(text);
+                dialog.showText(data.text);
                 break;
 
             case 'history':
@@ -385,94 +310,3 @@ window.addEventListener('load', function() {
     });
 
 });
-
-function showDialog(contents) {
-    var dialog = document.createElement('div');
-    dialog.appendChild(contents);
-    dialog.className = 'dialog';
-    document.body.appendChild(dialog);
-
-    var overlay = document.createElement('div');
-    overlay.className = 'overlay';
-    document.body.appendChild(overlay);
-
-    var closeDialog = function() {
-        document.body.removeChild(dialog);
-        document.body.removeChild(overlay);
-    };
-
-    var closeBtn = document.createElement('button');
-    dialog.appendChild(closeBtn);
-    closeBtn.className = 'closeBtn';
-    closeBtn.textContent = '×';
-    closeBtn.addEventListener('click', closeDialog);
-
-    return closeDialog;
-}
-
-function showLoginPrompt(sock) {
-    var loginForm = document.createElement('form');
-
-    ['username', 'password'].forEach(function(type) {
-        var container = document.createElement('p');
-        loginForm.appendChild(container);
-
-        var label = document.createElement('label');
-        label.textContent = type.replace(/./, type[0].toUpperCase()) + ': ';
-        label['for'] = type + 'Input';
-        container.appendChild(label);
-
-        var input = document.createElement('input');
-        input.type = type == 'password' ? type : 'text';
-        input.id = type + 'Input';
-        container.appendChild(input);
-    });
-
-    var submitAction = 'auth';
-
-    var submitLogin = document.createElement('input');
-    submitLogin.type = 'submit';
-    submitLogin.value = 'Login';
-    loginForm.appendChild(submitLogin);
-
-    var submitRegister = document.createElement('input');
-    submitRegister.type = 'submit';
-    submitRegister.value = 'Register';
-    submitRegister.addEventListener('click', function() {
-        submitAction = 'register';
-    });
-    loginForm.appendChild(submitRegister);
-
-    var closeDialog;
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        sock.send(JSON.stringify({
-            type: submitAction,
-            username: document.getElementById('usernameInput').value,
-            password: document.getElementById('passwordInput').value
-        }));
-        closeDialog();
-    });
-
-    closeDialog = showDialog(loginForm);
-    document.getElementById('usernameInput').focus();
-}
-
-function fmttime(date, relative) {
-    var days = Math.floor(now / (1000 * 60 * 60 * 24)) -
-        Math.floor(date / (1000 * 60 * 60 * 24));
-    if (relative) {
-        var now = new Date();
-        var seconds = (now.getTime() - date.getTime()) / 1000;
-        if (seconds < 60) return Math.floor(seconds) + 's';
-        var minutes = seconds / 60;
-        if (minutes < 60) return Math.floor(minutes) + 'm';
-        var hours = minutes / 60;
-        if (hours < 24) return Math.floor(hours) + 'h';
-        if (days < 32) return days + 'd';
-        return fmttime(date, false);
-    } else {
-        return date.toLocaleTimeString() + (days ?
-                ' ' + date.toLocaleDateString() : '');
-    }
-}
