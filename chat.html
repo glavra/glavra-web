@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <title>Glavra&mdash;chat</title>
+        <meta charset='utf-8'>
+
+        <!-- libaries -->
+        <script type='text/javascript' src='/commonmark.min.js'></script>
+        <script type='text/javascript' src='/autolink.min.js'></script>
+
+        <!-- modules -->
+        <script type='text/javascript' src='/dialog.js'></script>
+        <script type='text/javascript' src='/input.js'></script>
+        <script type='text/javascript' src='/markdown.js'></script>
+        <script type='text/javascript' src='/messagestatus.js'></script>
+        <script type='text/javascript' src='/strings.js'></script>
+        <script type='text/javascript' src='/transcript.js'></script>
+
+        <!-- main script -->
+        <script type='text/javascript' src='/chat.js'></script>
+
+        <link rel='stylesheet' type='text/css' href='/chat.css'></link>
+        <link rel='stylesheet' type='text/css' href='/font-awesome-4.6.3/css/font-awesome.min.css'></link>
+    </head>
+    <body>
+        <div id='glavra'>
+            <div id='mainarea'>
+                <div id='messages'></div>
+                <form id='inputForm'>
+                    <textarea id='message'></textarea>
+                    <div id='messageButtons'>
+                        <input type='button' id='send' value='Send'>
+                        <input type='button' id='cancel' value='Cancel'>
+                    </div>
+                </form>
+            </div>
+            <div id='sidebar'>
+                <div id='pinned'></div>
+                <div id='starred'></div>
+            </div>
+        </div>
+    </body>
+</html>
