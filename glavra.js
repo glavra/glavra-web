@@ -1,54 +1,18 @@
 window.addEventListener('load', function() {
 
-    var sendButton = document.getElementById('send');
-    var cancelButton = document.getElementById('cancel');
-    var messageInput = document.getElementById('message');
-
-    var sendMessage = function() {
-        if (messageStatus.edit) {
-            sock.send(JSON.stringify({
-                type: 'edit',
-                id: messageStatus.edit,
-                replyid: messageStatus.reply,
-                text: messageInput.value
-            }));
-            messageInput.value = '';
-            messageStatus.clear('edit');
-        } else {
-            sock.send(JSON.stringify({
-                type: 'message',
-                replyid: messageStatus.reply,
-                text: messageInput.value
-            }));
-            messageInput.value = '';
-        }
-        messageStatus.clear('reply');
-    };
-    sendButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        sendMessage();
-    });
-    cancelButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        messageStatus.clear('edit');
-        messageStatus.clear('reply');
-    });
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.which == 13 && !e.ctrlKey && !e.shiftKey && !e.altKey &&
-                !e.metaKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
+    // needed by 'message'
     var messagesList = document.getElementById('messages');
+    var messageInput = document.getElementById('message');
+    // needed by 'starboard'
     var starredList = document.getElementById('starred');
     var pinnedList = document.getElementById('pinned');
 
     var sock = new WebSocket('ws://127.0.0.1:3012');
+
     sock.addEventListener('open', function() {
         dialog.showLoginPrompt(sock);
     });
+
     sock.addEventListener('message', function(e) {
         var data = JSON.parse(e.data);
         console.log(data);
@@ -308,5 +272,7 @@ window.addEventListener('load', function() {
     window.addEventListener('beforeunload', function() {
         sock.close();
     });
+
+    input.init(sock);
 
 });
