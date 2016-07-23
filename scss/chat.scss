@@ -1,7 +1,18 @@
+$bg:  #f8f8f8 !default;
+$bg1: #e8e8e8 !default;
+$bg2: #d8d8d8 !default;
+$fg1: #888888 !default;
+$fg:  #282828 !default;
+
+$red:    #f84848 !default;
+$yellow: #f8f848 !default;
+$green:  #48f848 !default;
+$blue:   #4848f8 !default;
+
 html {
     font: 11pt sans-serif;
-    background-color: #ccccff;
-    color: #222222;
+    background-color: $bg;
+    color: $fg;
     line-height: 1.5;
 }
 
@@ -61,8 +72,8 @@ html {
 .messageList {
     flex: 1;
     position: relative;
-    background-color: #dddddd;
-    border: 1px dotted #bbbbbb;
+    background-color: $bg1;
+    border: 1px dotted $bg2;
     margin: 0px 3px;
     padding: 8px;
     border-radius: 3px;
@@ -77,11 +88,11 @@ html {
 }
 
 .messageList > div.reply, .messageList > div.hoverreply {
-    background-color: #ccffcc;
+    background-color: mix($bg1, $green, 75%);
 }
 
 .messageList > div.jumpHighlight {
-    background-color: #ffffcc;
+    background-color: mix($bg1, $yellow, 75%);
 }
 
 .reply-arrow {
@@ -90,17 +101,17 @@ html {
 }
 
 .messageList > div.edit {
-    background-color: #ffcccc;
+    background-color: mix($bg1, $red, 75%);
 }
 
 .messageList > div > .deleted {
-    color: #888888;
+    color: $fg1;
 }
 
 .messageList > div.votebox {
     position: absolute;
     right: 5px;
-    color: #888888;
+    color: $fg1;
     z-index: 1;
 }
 
@@ -117,7 +128,7 @@ html {
     height: 300px;
     margin-top: -150px;
     z-index: 102;
-    background-color: white;
+    background-color: $bg;
     padding: 10px;
     border-radius: 10px;
 }
@@ -148,7 +159,7 @@ html {
     position: absolute;
     top: 0px;
     right: 0px;
-    background-color: #cccccc;
+    background-color: $bg2;
     z-index: 2;
 }
 
@@ -158,12 +169,16 @@ html {
 
 .miniInfo {
     font-size: 10pt;
-    color: #888888;
+    color: $fg1;
     padding: 0px 3px;
 }
 
 blockquote {
-    border-left: 3px solid #888888;
+    border-left: 3px solid $fg1;
     margin-left: 5px;
     padding-left: 5px;
+}
+
+a {
+    color: $blue;
 }
