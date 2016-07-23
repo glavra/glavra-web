@@ -286,16 +286,7 @@ window.addEventListener('load', function() {
                 break;
 
             case 'error':
-                dialog.showText([
-                    'You need to be logged in to do that.',
-                    'The request was malformed.',
-                    'Your message may not be empty.',
-                    'You may not edit or delete a message that is already deleted.',
-                    'The request URL could not be parsed.',
-                    'No room ID was specified.',
-                    'The room ID that was specified was invalid.',
-                    'The room ID that was specified does not exist.'
-                ][data.code]);
+                dialog.showText(strings.errCodes[data.code]);
                 break;
 
             case 'history':

@@ -4,6 +4,16 @@ var strings = {
     authFailure: 'Your username or password was incorrect.',
     registerSuccess: 'Your account has been created.',
     registerFailure: 'Someone already has that username.',
+    errCodes: [
+        'You need to be logged in to do that.',
+        'The request was malformed.',
+        'Your message may not be empty.',
+        'You may not edit or delete a message that is already deleted.',
+        'The request URL could not be parsed.',
+        'No room ID was specified.',
+        'The room ID that was specified was invalid.',
+        'The room ID that was specified does not exist.'
+    ],
     fmttime: function(date, relative) {
         var days = Math.floor(now / (1000 * 60 * 60 * 24)) -
             Math.floor(date / (1000 * 60 * 60 * 24));
