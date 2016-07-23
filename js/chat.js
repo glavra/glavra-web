@@ -3,8 +3,8 @@ window.addEventListener('load', function() {
     var roomId, roomMatch;
     if (roomMatch = location.search.slice(1).match(/(^|&)room=(\d+)/)) {
         roomId = +roomMatch[2];
-    } else if (roomMatch = location.pathname.match(/^\/chat\/(\d+)$/)) {
-        roomId = +roomMatch[1];
+    } else if (roomMatch = location.pathname.match(/^\/chat(-dark)?\/(\d+)$/)) {
+        roomId = +roomMatch[2];
     } else return; // TODO room list?
 
     // needed by 'message'
