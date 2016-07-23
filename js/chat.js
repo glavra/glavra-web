@@ -29,7 +29,14 @@ window.addEventListener('load', function() {
     var sock = new WebSocket('ws://127.0.0.1:3012?room=' + roomId);
 
     sock.addEventListener('open', function() {
-        dialog.showLoginPrompt(sock);
+        var loginLink = document.createElement('a');
+        loginLink.textContent = 'Log in';
+        loginLink.href = 'javascript:;';
+        loginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            dialog.showLoginPrompt(sock);
+        });
+        document.getElementById('account').appendChild(loginLink);
     });
 
     sock.addEventListener('message', function(e) {
@@ -38,7 +45,7 @@ window.addEventListener('load', function() {
         switch (data.type) {
             case 'auth':
                 if (data.success) {
-                    // TODO update logged in
+                    document.getElementById('account').innerText = 'Logged in';
                     dialog.showText(strings.authSuccess);
                 } else {
                     dialog.showText(strings.authFailure);
@@ -47,7 +54,7 @@ window.addEventListener('load', function() {
 
             case 'register':
                 if (data.success) {
-                    // TODO update logged in
+                    document.getElementById('account').innerText = 'Logged in';
                     dialog.showText(strings.registerSuccess);
                 } else {
                     dialog.showText(strings.registerFailure);

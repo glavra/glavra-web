@@ -79,6 +79,14 @@ html {
     border-radius: 3px;
 }
 
+#account {
+    text-align: right;
+}
+
+#header > h1 {
+    margin: 0px;
+}
+
 #pinned > .messageList, #starred > .messageList {
     margin: 3px 0px;
 }
