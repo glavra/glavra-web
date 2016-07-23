@@ -314,6 +314,12 @@ window.addEventListener('load', function() {
                 dialog.show(list);
                 break;
 
+            case 'roominfo':
+                document.getElementById('roomname').textContent = data.name;
+                document.getElementById('roomdesc').innerHTML =
+                    markdown.render(data.desc);
+                break;
+
         }
     });
 

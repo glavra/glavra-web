@@ -24,6 +24,7 @@ html {
 #sidebar {
     width: 200px;
     padding: 5px;
+    overflow-y: auto;
 }
 
 #messages {
