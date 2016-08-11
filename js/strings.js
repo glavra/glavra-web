@@ -29,7 +29,7 @@ var strings = {
             var hours = minutes / 60;
             if (hours < 24) return Math.floor(hours) + 'h ago';
             if (days < 32) return days + 'd ago';
-            return fmttime(date, false);
+            return strings.fmttime(date, false);
         } else {
             return date.toLocaleTimeString() + (days ?
                     ' ' + date.toLocaleDateString() : '');
