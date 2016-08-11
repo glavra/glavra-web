@@ -13,7 +13,8 @@ var strings = {
         'No room ID was specified.',
         'The room ID that was specified was invalid.',
         'The room ID that was specified does not exist.',
-        'Your username may not be more than 20 characters long.'
+        'Your username may not be more than 20 characters long.',
+        'You can\'t vote on your own messages.'
     ],
     fmttime: function(date, relative) {
         var days = Math.floor(now / (1000 * 60 * 60 * 24)) -
