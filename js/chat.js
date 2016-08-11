@@ -187,7 +187,7 @@ window.addEventListener('load', function() {
                     monologue.appendChild(messageList);
                     messageList.appendChild(message);
                 }
-                messagesList.scrollTo(0, messagesList.scrollHeight);
+                messagesList.scrollTop = messagesList.scrollHeight;
                 break;
 
             case 'edit':
