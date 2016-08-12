@@ -14,7 +14,6 @@ var strings = {
         'The room ID that was specified was invalid.',
         'The room ID that was specified does not exist.',
         'Your username may not be more than 20 characters long.',
-        'You can\'t vote on your own messages.',
         'You\'re doing that too fast.'
     ],
     fmttime: function(date, relative) {
