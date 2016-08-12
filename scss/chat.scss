@@ -35,7 +35,7 @@ html {
 #sidebar {
     background-color: $bg;
     width: 25%;
-    min-width: 200px;
+    min-width: 300px;
     padding: 5px;
     overflow-y: auto;
     top: 0px;
@@ -57,6 +57,7 @@ html {
     position: fixed;
     top: 20px;
     right: 20px;
+    z-index: 500;
     cursor: pointer;
 }
 
@@ -211,4 +212,15 @@ blockquote {
 
 a {
     color: $blue;
+}
+
+@media (max-width: 900px) {
+    .monologue {
+        flex-direction: column;
+    }
+}
+@media (max-width: 700px) {
+    #sidebar {
+        position: fixed;
+    }
 }

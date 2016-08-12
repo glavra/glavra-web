@@ -7,10 +7,7 @@ window.addEventListener('load', function() {
         roomId = +roomMatch[2];
     } else return; // TODO room list?
 
-    if (window.innerWidth < 700) {
-        sidebar.collapse();
-        document.getElementById('sidebar').style.position = 'fixed';
-    }
+    if (window.innerWidth <= 800) sidebar.collapse();
 
     document.getElementById('collapseSidebar').addEventListener('click', function() {
         sidebar.collapse();
