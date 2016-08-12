@@ -40,7 +40,7 @@ html {
     overflow-y: auto;
     top: 0px;
     right: 0px;
-    z-index: 500;
+    z-index: 50;
 }
 
 #expandSidebar {
@@ -57,7 +57,7 @@ html {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 500;
+    z-index: 50;
     cursor: pointer;
 }
 
@@ -212,6 +212,24 @@ blockquote {
 
 a {
     color: $blue;
+}
+
+textarea {
+    color: $fg;
+    background-color: $bg;
+    border: 1px solid $bg1;
+}
+
+button, input {
+    color: $fg;
+    background-color: $bg1;
+    border: 1px solid $bg2;
+    border-radius: 2px;
+    padding: 3px;
+}
+
+button, input[type="button"], input[type="submit"] {
+    padding: 3px 15px;
 }
 
 @media (max-width: 900px) {
