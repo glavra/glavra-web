@@ -7,6 +7,15 @@ window.addEventListener('load', function() {
         roomId = +roomMatch[2];
     } else return; // TODO room list?
 
+    if (window.innerWidth < 700) sidebar.collapse();
+
+    document.getElementById('collapseSidebar').addEventListener('click', function() {
+        sidebar.collapse();
+    });
+    document.getElementById('expandSidebar').addEventListener('click', function() {
+        sidebar.expand();
+    });
+
     // needed by 'message'
     var messagesList = document.getElementById('messages');
     var messageInput = document.getElementById('message');
@@ -30,7 +39,7 @@ window.addEventListener('load', function() {
 
     sock.addEventListener('open', function() {
         var loginLink = document.createElement('a');
-        loginLink.textContent = 'Log in';
+        loginLink.textContent = 'log in';
         loginLink.href = 'javascript:;';
         loginLink.addEventListener('click', function(e) {
             e.preventDefault();
@@ -45,7 +54,7 @@ window.addEventListener('load', function() {
         switch (data.type) {
             case 'auth':
                 if (data.success) {
-                    document.getElementById('account').innerText = 'Logged in';
+                    document.getElementById('account').innerText = 'logged in';
                     dialog.showText(strings.authSuccess);
                 } else {
                     dialog.showText(strings.authFailure);
@@ -54,7 +63,7 @@ window.addEventListener('load', function() {
 
             case 'register':
                 if (data.success) {
-                    document.getElementById('account').innerText = 'Logged in';
+                    document.getElementById('account').innerText = 'logged in';
                     dialog.showText(strings.registerSuccess);
                 } else {
                     dialog.showText(strings.registerFailure);

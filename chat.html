@@ -3,6 +3,7 @@
     <head>
         <title>Glavra&mdash;chat</title>
         <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
 
         <!-- libaries -->
         <script type='text/javascript' src='/js/commonmark.min.js'></script>
@@ -13,6 +14,7 @@
         <script type='text/javascript' src='/js/input.js'></script>
         <script type='text/javascript' src='/js/markdown.js'></script>
         <script type='text/javascript' src='/js/messagestatus.js'></script>
+        <script type='text/javascript' src='/js/sidebar.js'></script>
         <script type='text/javascript' src='/js/strings.js'></script>
         <script type='text/javascript' src='/js/transcript.js'></script>
 
@@ -35,7 +37,9 @@
                 </form>
             </div>
             <div id='sidebar'>
-                <div id='account'></div>
+                <div id='account'>
+                    <a href='javascript:;' id='collapseSidebar'>collapse</a>
+                </div>
                 <div id='header'>
                     <h1 id='roomname'></h1>
                     <p id='roomdesc'></p>
@@ -43,6 +47,7 @@
                 <div id='pinned'></div>
                 <div id='starred'></div>
             </div>
+            <div id='expandSidebar'>❮</div>
         </div>
     </body>
 </html>

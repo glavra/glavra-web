@@ -33,9 +33,26 @@ html {
 }
 
 #sidebar {
-    width: 200px;
+    width: 25%;
+    min-width: 200px;
     padding: 5px;
     overflow-y: auto;
+}
+
+#expandSidebar {
+    display: none;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 1.5em;
+    background-color: $fg1;
+    border: 5px solid $bg;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
 }
 
 #messages {
