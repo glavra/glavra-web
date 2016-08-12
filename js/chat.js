@@ -261,7 +261,7 @@ window.addEventListener('load', function() {
                 data.messages.forEach(function(messageData) {
                     var messageWrapper = document.createElement('div');
                     messageWrapper.className = 'messageList';
-                    list.insertBefore(messageWrapper, list.firstChild);
+                    list.appendChild(messageWrapper);
 
                     var message = document.createElement('div');
                     message.dataset.id = messageData.id;
