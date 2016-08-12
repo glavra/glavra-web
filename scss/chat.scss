@@ -33,10 +33,14 @@ html {
 }
 
 #sidebar {
+    background-color: $bg;
     width: 25%;
     min-width: 200px;
     padding: 5px;
     overflow-y: auto;
+    top: 0px;
+    right: 0px;
+    z-index: 500;
 }
 
 #expandSidebar {
@@ -47,8 +51,9 @@ html {
     border-radius: 50px;
     text-align: center;
     font-size: 1.5em;
+    color: $bg1;
     background-color: $fg1;
-    border: 5px solid $bg;
+    border: 5px solid $bg2;
     position: fixed;
     top: 20px;
     right: 20px;
