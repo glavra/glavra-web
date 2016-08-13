@@ -1,6 +1,12 @@
 actions.auth = function(data) {
     if (data.success) {
-        document.getElementById('account').innerText = 'logged in';
+        var account = document.getElementById('account');
+        account.innerText = 'log out';
+        account.removeEventListener('click', util.loginListener);
+        account.addEventListener('click', function() {
+            localStorage.removeItem('glavra-token');
+            location.reload();
+        });
         if (data.token) localStorage.setItem('glavra-token', data.token);
         dialog.showText(strings.authSuccess);
     } else {

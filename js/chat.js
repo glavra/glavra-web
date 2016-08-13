@@ -24,13 +24,14 @@ window.addEventListener('load', function() {
 
     sock.addEventListener('open', function() {
         var loginLink = document.createElement('a');
+        loginLink.id = 'account';
         loginLink.textContent = 'log in';
         loginLink.href = 'javascript:;';
-        loginLink.addEventListener('click', function(e) {
+        loginLink.addEventListener('click', util.loginListener = function(e) {
             e.preventDefault();
             dialog.showLoginPrompt(sock);
         });
-        document.getElementById('account').appendChild(loginLink);
+        document.getElementById('links').appendChild(loginLink);
     });
 
     sock.addEventListener('message', function(e) {
