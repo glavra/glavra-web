@@ -29,6 +29,11 @@ window.addEventListener('load', function() {
             dialog.showLoginPrompt(sock);
         });
         document.getElementById('account').appendChild(loginLink);
+
+        var token = localStorage.getItem('glavra-token');
+        if (token) {
+            sock.send(JSON.stringify({type: 'auth', token: token}));
+        }
     });
 
     sock.addEventListener('message', function(e) {
