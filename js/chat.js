@@ -18,7 +18,9 @@ window.addEventListener('load', function() {
         sidebar.expand();
     });
 
-    var sock = new WebSocket('ws://127.0.0.1:3012?room=' + roomId);
+    var token = localStorage.getItem('glavra-token');
+    var sock = new WebSocket('ws://127.0.0.1:3012?room=' + roomId +
+            (token ? '&token=' + token : ''));
 
     sock.addEventListener('open', function() {
         var loginLink = document.createElement('a');
@@ -29,11 +31,6 @@ window.addEventListener('load', function() {
             dialog.showLoginPrompt(sock);
         });
         document.getElementById('account').appendChild(loginLink);
-
-        var token = localStorage.getItem('glavra-token');
-        if (token) {
-            sock.send(JSON.stringify({type: 'auth', token: token}));
-        }
     });
 
     sock.addEventListener('message', function(e) {
