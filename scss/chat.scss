@@ -152,14 +152,15 @@ html {
 
 .dialog {
     position: absolute;
-    top: 50%;
-    left: 0px;
+    top: 0px;
     right: 0px;
+    left: 0px;
+    bottom: 0px;
     width: 90%;
+    height: 90%;
     max-width: 500px;
-    margin: 0px auto;
-    height: 300px;
-    margin-top: -150px;
+    max-height: 300px;
+    margin: auto;
     z-index: 102;
     background-color: $bg;
     padding: 10px;
