@@ -125,4 +125,9 @@ actions.message = function(data) {
         messageList.appendChild(message);
     }
     util.messagesList.scrollTop = util.messagesList.scrollHeight;
+
+    if (typeof Notification !== 'undefined' && document.hidden &&
+            Notification.permission == 'granted') {
+        new Notification('Glavra', { body: data.text });
+    }
 };

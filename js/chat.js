@@ -63,4 +63,6 @@ window.addEventListener('load', function() {
 
     input.init(sock);
 
+    if (typeof Notification !== 'undefined') Notification.requestPermission();
+
 });
