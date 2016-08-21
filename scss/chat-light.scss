@@ -9,4 +9,5 @@ $yellow: #f8f848 !default;
 $green:  #48f848 !default;
 $blue:   #4848f8 !default;
 
-@import "chat.scss"
+@import "generic.scss";
+@import "chat.scss";
