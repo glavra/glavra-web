@@ -11,3 +11,14 @@ var sidebar = {
     }
 
 };
+
+onload.push(function() {
+    if (window.innerWidth <= 800) sidebar.collapse();
+
+    document.getElementById('collapseSidebar').addEventListener('click', function() {
+        sidebar.collapse();
+    });
+    document.getElementById('expandSidebar').addEventListener('click', function() {
+        sidebar.expand();
+    });
+});

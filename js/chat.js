@@ -1,6 +1,8 @@
-var actions = {}, util = {};
+var actions = {}, util = {}, onload = [];
 
 window.addEventListener('load', function() {
+
+    onload.forEach(function(f) { f(); });
 
     var roomId, roomMatch;
     if (roomMatch = location.search.slice(1).match(/(^|&)room=(\d+)/)) {
@@ -8,15 +10,6 @@ window.addEventListener('load', function() {
     } else if (roomMatch = location.pathname.match(/^\/chat(-dark)?\/(\d+)$/)) {
         roomId = +roomMatch[2];
     } else return; // TODO room list?
-
-    if (window.innerWidth <= 800) sidebar.collapse();
-
-    document.getElementById('collapseSidebar').addEventListener('click', function() {
-        sidebar.collapse();
-    });
-    document.getElementById('expandSidebar').addEventListener('click', function() {
-        sidebar.expand();
-    });
 
     var token = localStorage.getItem('glavra-token');
     var sock = new WebSocket('ws://127.0.0.1:3012?room=' + roomId +
