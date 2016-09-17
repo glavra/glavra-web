@@ -2,6 +2,8 @@ var actions = {}, util = {}, onload = [];
 
 window.addEventListener('load', function() {
 
+    onload.forEach(function(f) { f(); });
+
     var token = localStorage.getItem('glavra-token');
     var sock = new WebSocket('ws://127.0.0.1:3012?queryrooms' +
             (token ? '&token=' + token : ''));
@@ -29,6 +31,17 @@ window.addEventListener('load', function() {
     // needed by 'roomlist'
     util.mainarea = document.getElementById('mainarea');
 
-    onload.forEach(function(f) { f(); });
+    document.getElementById('createRoom').addEventListener('submit', function(e) {
+        e.preventDefault();
+        sock.send(JSON.stringify({
+            type: 'room',
+            name: document.getElementById('newRoomName').value,
+            desc: document.getElementById('newRoomDesc').value
+        }));
+    });
+
+    window.addEventListener('beforeunload', function() {
+        sock.close();
+    });
 
 });
