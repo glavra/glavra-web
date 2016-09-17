@@ -38,6 +38,7 @@ window.addEventListener('load', function() {
             name: document.getElementById('newRoomName').value,
             desc: document.getElementById('newRoomDesc').value
         }));
+        document.getElementById('createRoom').innerText = 'creating room...';
     });
 
     window.addEventListener('beforeunload', function() {
