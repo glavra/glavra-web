@@ -33,6 +33,8 @@ window.addEventListener('load', function() {
         actions[data.type](data);
     });
 
+    util.pagetype = 'chat';
+
     // needed by 'message'
     util.messagesList = document.getElementById('messages');
     util.messageInput = document.getElementById('message');

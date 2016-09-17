@@ -3,8 +3,8 @@ var actions = {}, util = {}, onload = [];
 window.addEventListener('load', function() {
 
     var token = localStorage.getItem('glavra-token');
-    var sock = new WebSocket('ws://127.0.0.1:3012' +
-            (token ? '?token=' + token : ''));
+    var sock = new WebSocket('ws://127.0.0.1:3012?queryrooms' +
+            (token ? '&token=' + token : ''));
 
     sock.addEventListener('open', function() {
         var loginLink = document.createElement('a');
@@ -23,6 +23,11 @@ window.addEventListener('load', function() {
         console.log(data);
         actions[data.type](data);
     });
+
+    util.pagetype = 'rooms';
+
+    // needed by 'roomlist'
+    util.mainarea = document.getElementById('mainarea');
 
     onload.forEach(function(f) { f(); });
 
