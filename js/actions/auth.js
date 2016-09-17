@@ -7,8 +7,10 @@ actions.auth = function(data) {
             localStorage.removeItem('glavra-token');
             location.reload();
         });
-        if (data.token) localStorage.setItem('glavra-token', data.token);
-        dialog.showText(strings.authSuccess);
+        if (data.token) {
+            localStorage.setItem('glavra-token', data.token);
+            dialog.showText(strings.authSuccess);
+        }
     } else {
         dialog.showText(strings.authFailure);
     }
