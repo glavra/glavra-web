@@ -4,8 +4,21 @@ window.addEventListener('load', function() {
 
     onload.forEach(function(f) { f(); });
 
+    var userId, userMatch;
+    if (userMatch = location.search.slice(1).match(/(^|&)id=(\d+)/)) {
+        userId = +userMatch[2];
+    } else if (userMatch = location.pathname.match(/^\/users\/(\d+)$/)) {
+        userId = +userMatch[1];
+    }
+
+    if (userId) {
+        document.getElementById('headerdesc').innerText = 'You are viewing ' +
+            'the profile of a specific user.';
+    }
+
     var token = localStorage.getItem('glavra-token');
-    var sock = new WebSocket('ws://127.0.0.1:3012?queryusers' +
+    var sock = new WebSocket('ws://127.0.0.1:3012?' +
+            (userId ? 'queryuser=' + userId : 'queryusers') +
             (token ? '&token=' + token : ''));
 
     sock.addEventListener('open', function() {
@@ -28,7 +41,7 @@ window.addEventListener('load', function() {
 
     util.pagetype = 'users';
 
-    // needed by 'userlist'
+    // needed by 'userinfo' and 'userlist'
     util.mainarea = document.getElementById('mainarea');
 
     window.addEventListener('beforeunload', function() {
