@@ -1,0 +1,13 @@
+$bg:  #f8f8f8 !default;
+$bg1: #e8e8e8 !default;
+$bg2: #d8d8d8 !default;
+$fg1: #888888 !default;
+$fg:  #282828 !default;
+
+$red:    #f84848 !default;
+$yellow: #f8f848 !default;
+$green:  #48f848 !default;
+$blue:   #4848f8 !default;
+
+@import "generic.scss";
+@import "users.scss";
