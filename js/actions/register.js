@@ -7,8 +7,11 @@ actions.register = function(data) {
             localStorage.removeItem('glavra-token');
             location.reload();
         });
-        if (data.token) localStorage.setItem('glavra-token', data.token);
-        dialog.showText(strings.registerSuccess);
+        if (data.token) {
+            localStorage.setItem('glavra-token', data.token);
+            localStorage.setItem('userid', data.userid);
+            dialog.showText(strings.registerSuccess);
+        }
     } else {
         dialog.showText(strings.registerFailure);
     }

@@ -9,6 +9,7 @@ actions.auth = function(data) {
         });
         if (data.token) {
             localStorage.setItem('glavra-token', data.token);
+            localStorage.setItem('userid', data.userid);
             dialog.showText(strings.authSuccess);
         }
     } else {

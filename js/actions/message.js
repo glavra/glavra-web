@@ -112,6 +112,7 @@ actions.message = function(data) {
         var monologue = document.createElement('div');
         monologue.dataset.userid = data.userid;
         monologue.className = 'monologue';
+        if (data.userid == localStorage.getItem('userid')) monologue.className += ' own';
         util.messagesList.appendChild(monologue);
 
         var usercard = document.createElement('div');

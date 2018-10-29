@@ -22,6 +22,11 @@
     margin: 8px 0px;
 }
 
+.monologue.own .messageList {
+    background-color: $bg2;
+    border-color: $fg1;
+}
+
 .usercard {
     width: 100px;
     overflow: hidden;
